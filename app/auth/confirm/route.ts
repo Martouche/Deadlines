@@ -17,13 +17,16 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const next = safeNextPath(searchParams.get("next"))
 
-  const supabase = await createClient()
+  // Lien au format implicite (#access_token=…) : le fragment n'arrive pas ici mais
+  // le navigateur le conserve à travers la redirection ; /login le prend en charge.
+  if (!(tokenHash && type) && !code) {
+    return NextResponse.redirect(new URL("/login", origin))
+  }
 
+  const supabase = await createClient()
   const { error } = tokenHash && type
     ? await supabase.auth.verifyOtp({ type, token_hash: tokenHash })
-    : code
-      ? await supabase.auth.exchangeCodeForSession(code)
-      : { error: new Error("Lien incomplet") }
+    : await supabase.auth.exchangeCodeForSession(code!)
 
   if (error) {
     return NextResponse.redirect(new URL("/login?error=lien-invalide", origin))

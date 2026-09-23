@@ -46,3 +46,10 @@ export async function requireAdmin() {
   if (profile.role !== "admin") notFound()
   return profile
 }
+
+/** Pour les Server Actions : erreur explicite plutôt qu'une page 404. La RLS reste la vraie barrière. */
+export async function assertAdmin() {
+  const profile = await getProfile()
+  if (profile?.role !== "admin") throw new Error("Action réservée à l'administrateur.")
+  return profile
+}

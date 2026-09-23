@@ -71,10 +71,7 @@ app/
 │       ├── page.tsx                   Liste des projets accessibles (RLS filtre seule)
 │       └── [projectId]/
 │           ├── layout.tsx             En-tête (titre, progression, deadline, badge finance) + onglets
-│           ├── page.tsx               Tâches : ?view=kanban|list
-│           ├── @modal/(.)tasks/[taskId]/page.tsx   Modale tâche (route interceptée)
-│           ├── @modal/default.tsx
-│           ├── tasks/[taskId]/page.tsx             Même contenu en pleine page (lien direct / refresh)
+│           ├── page.tsx               Tâches : ?view=kanban|list, fiche tâche en modale via ?task=<id>
 │           ├── documents/page.tsx
 │           ├── activity/page.tsx
 │           ├── time/page.tsx          Admin uniquement (notFound() pour un client)
@@ -130,7 +127,7 @@ npx shadcn@latest add button card badge dialog sheet tabs input textarea select 
 ```
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...         # publique, protégée par la RLS
-SUPABASE_SECRET_KEY=...                    # service role (étape 5, invitations) — jamais préfixé NEXT_PUBLIC
+SUPABASE_SERVICE_ROLE_KEY=...              # service role (invitations) — jamais préfixé NEXT_PUBLIC
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
@@ -224,7 +221,7 @@ Libellés du badge financier (`lib/constants.ts`) :
 - Realtime (optionnel) : `supabase.channel('tasks').on('postgres_changes', { table: 'tasks', filter: 'project_id=eq.' + id }, …)` pour que le client voie bouger les cartes.
 
 ### Étape 8 — Modale de tâche
-- Route interceptée `@modal/(.)tasks/[taskId]` → `Dialog` shadcn ; `router.back()` à la fermeture.
+- Paramètre `?task=<id>` : la page charge le détail côté serveur et ouvre un `Dialog` ; lien partageable, fermeture = retrait du paramètre.
 - Admin : champs éditables (titre, Markdown avec aperçu, deadline, priorité, étiquettes, checklist).
 - Client : rendu lecture seule — `react-markdown` + `remark-gfm` (**sans** `rehype-raw`, pour ne jamais injecter de HTML).
 - Bouton **« Valider cette étape »** visible pour un client si `status = 'review'` et non validée → `supabase.rpc('validate_task', { p_task_id })`.
