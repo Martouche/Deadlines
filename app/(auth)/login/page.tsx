@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { AuthShell } from "@/components/auth/auth-shell"
+import { HashSessionHandler } from "@/components/auth/hash-session-handler"
 import { LoginForm } from "@/components/auth/login-form"
 import { safeNextPath } from "@/lib/safe-redirect"
 
@@ -17,6 +18,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <AuthShell title="Connexion" subtitle="Accède au suivi de ton projet, aux livrables et aux échanges.">
+      <HashSessionHandler />
       <LoginForm next={nextPath} initialError={errorMessage} />
     </AuthShell>
   )
