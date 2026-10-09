@@ -55,7 +55,7 @@ export default async function TimePage({ params }: PageProps<"/projects/[project
     <div className="flex flex-col gap-8">
       <Timer projectId={projectId} tasks={tasks ?? []} running={running} />
 
-      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 lg:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="bg-background p-5">
             <dt className="text-xs text-muted-foreground">{s.label}</dt>
@@ -76,7 +76,7 @@ export default async function TimePage({ params }: PageProps<"/projects/[project
                       <span className="truncate">{b.title}</span>
                       <span className="font-mono text-muted-foreground">{formatMinutes(b.minutes)}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.06]">
+                    <div className="h-1.5 rounded-full bg-foreground/[0.06]">
                       <div
                         className="h-full rounded-full bg-foreground/70"
                         style={{ width: `${(b.minutes / total) * 100}%` }}
@@ -95,7 +95,7 @@ export default async function TimePage({ params }: PageProps<"/projects/[project
 
         <section>
           <h2 className="mb-3 text-sm font-medium text-muted-foreground">Saisie manuelle</h2>
-          <div className="rounded-xl border border-white/10 p-5">
+          <div className="rounded-xl border border-border p-5">
             <ManualEntryForm projectId={projectId} tasks={tasks ?? []} />
           </div>
         </section>

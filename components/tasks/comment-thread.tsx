@@ -40,12 +40,12 @@ export function CommentThread({ taskId, comments, currentUserId, isAdmin }: Comm
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="group rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5"
+              className="group rounded-lg border border-border bg-foreground/[0.02] px-3 py-2.5"
             >
               <div className="flex items-center gap-2 text-xs">
                 <span className="font-medium">{displayName(c.author)}</span>
                 {c.author?.role === "admin" && (
-                  <span className="rounded-full border border-white/10 px-1.5 text-[10px] text-muted-foreground">Prestataire</span>
+                  <span className="rounded-full border border-border px-1.5 text-[10px] text-muted-foreground">Prestataire</span>
                 )}
                 <span className="text-muted-foreground">{formatRelative(c.created_at)}</span>
                 {(c.author_id === currentUserId || isAdmin) && (
@@ -59,7 +59,7 @@ export function CommentThread({ taskId, comments, currentUserId, isAdmin }: Comm
                   </button>
                 )}
               </div>
-              <p className="mt-1.5 text-sm whitespace-pre-wrap text-zinc-300">{c.body}</p>
+              <p className="mt-1.5 text-sm whitespace-pre-wrap text-foreground/85">{c.body}</p>
             </motion.li>
           ))}
         </AnimatePresence>

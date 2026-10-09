@@ -28,7 +28,7 @@ export default async function NewProjectPage({ searchParams }: PageProps<"/proje
           </Link>
         </p>
       ) : (
-        <div className="rounded-xl border border-white/10 p-6">
+        <div className="rounded-xl border border-border p-6">
           <ProjectForm
             action={createProject}
             clients={(clients ?? []).map((c) => ({ id: c.id, label: c.company ? `${c.company} — ${c.name}` : c.name }))}

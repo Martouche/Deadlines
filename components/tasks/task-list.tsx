@@ -44,16 +44,16 @@ export function TaskList({ tasks, labels }: { tasks: TaskCardData[]; labels: Map
     <div className="flex flex-col gap-8">
       {groupByDeadline(tasks).map((group) => (
         <section key={group.key}>
-          <h3 className={cn("mb-3 text-sm font-medium", group.key === "overdue" ? "text-red-300" : "text-muted-foreground")}>
+          <h3 className={cn("mb-3 text-sm font-medium", group.key === "overdue" ? "text-red-700 dark:text-red-300" : "text-muted-foreground")}>
             {group.title} <span className="font-mono text-xs">· {group.tasks.length}</span>
           </h3>
-          <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+          <ul className="divide-y divide-border rounded-xl border border-border">
             {group.tasks.map((task) => (
               <li key={task.id}>
                 <Link
                   href={taskLink(task.id)}
                   scroll={false}
-                  className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors hover:bg-white/[0.03] md:grid-cols-[140px_1fr_auto_120px]"
+                  className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors hover:bg-foreground/[0.03] md:grid-cols-[140px_1fr_auto_120px]"
                 >
                   <span className="hidden md:block">
                     <TaskStatusBadge status={task.status} />
@@ -65,7 +65,7 @@ export function TaskList({ tasks, labels }: { tasks: TaskCardData[]; labels: Map
                     <LabelList ids={task.label_ids} labels={labels} />
                   </span>
                   <span className="flex items-center gap-2">
-                    {task.client_validated_at && <CheckCheck className="size-4 text-emerald-300" aria-label="Validée" />}
+                    {task.client_validated_at && <CheckCheck className="size-4 text-emerald-700 dark:text-emerald-300" aria-label="Validée" />}
                     <PriorityBadge priority={task.priority} />
                   </span>
                   <span className="col-span-2 text-xs text-muted-foreground md:col-span-1 md:text-right">

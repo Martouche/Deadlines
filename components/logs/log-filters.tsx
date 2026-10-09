@@ -32,14 +32,14 @@ export function LogFilters({ level, search }: { level: string; search: string })
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <nav className="inline-flex rounded-lg border border-white/10 p-0.5" aria-label="Niveau">
+        <nav className="inline-flex rounded-lg border border-border p-0.5" aria-label="Niveau">
           {LOG_LEVEL_FILTERS.map((f) => (
             <Link
               key={f.value}
               href={hrefWith("niveau", f.value)}
               className={cn(
                 "rounded-md px-3 py-1.5 text-sm transition-colors",
-                level === f.value ? "bg-white/[0.08] text-foreground" : "text-muted-foreground hover:text-foreground",
+                level === f.value ? "bg-foreground/[0.08] text-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {f.label}

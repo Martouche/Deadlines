@@ -18,26 +18,26 @@ export const TASK_STATUSES: Option<TaskStatus>[] = [
 ]
 
 export const TASK_PRIORITIES: Option<TaskPriority>[] = [
-  { value: "low", label: "Basse", className: "border-white/10 text-zinc-400" },
-  { value: "medium", label: "Moyenne", className: "border-sky-400/30 text-sky-300" },
-  { value: "high", label: "Haute", className: "border-amber-400/30 text-amber-300" },
-  { value: "urgent", label: "Urgente", className: "border-red-400/40 bg-red-500/10 text-red-300" },
+  { value: "low", label: "Basse", className: "border-border text-muted-foreground" },
+  { value: "medium", label: "Moyenne", className: "border-sky-400/30 text-sky-700 dark:text-sky-300" },
+  { value: "high", label: "Haute", className: "border-amber-400/30 text-amber-700 dark:text-amber-300" },
+  { value: "urgent", label: "Urgente", className: "border-red-400/40 bg-red-500/10 text-red-700 dark:text-red-300" },
 ]
 
 export const PROJECT_STATUSES: Option<ProjectStatus>[] = [
-  { value: "draft", label: "Brouillon", className: "text-zinc-400" },
-  { value: "active", label: "Actif", className: "text-emerald-300" },
-  { value: "on_hold", label: "En pause", className: "text-amber-300" },
-  { value: "completed", label: "Terminé", className: "text-sky-300" },
-  { value: "archived", label: "Archivé", className: "text-zinc-500" },
+  { value: "draft", label: "Brouillon", className: "text-muted-foreground" },
+  { value: "active", label: "Actif", className: "text-emerald-700 dark:text-emerald-300" },
+  { value: "on_hold", label: "En pause", className: "text-amber-700 dark:text-amber-300" },
+  { value: "completed", label: "Terminé", className: "text-sky-700 dark:text-sky-300" },
+  { value: "archived", label: "Archivé", className: "text-muted-foreground" },
 ]
 
 export const FINANCIAL_STATUSES: Option<FinancialStatus>[] = [
-  { value: "quote_sent", label: "Devis envoyé", className: "border-white/15 text-zinc-300" },
-  { value: "deposit_paid", label: "Acompte payé", className: "border-sky-400/30 bg-sky-400/10 text-sky-300" },
-  { value: "in_delivery", label: "En cours de livraison", className: "border-violet-400/30 bg-violet-400/10 text-violet-300" },
-  { value: "balance_due", label: "Solde à régler", className: "border-amber-400/30 bg-amber-400/10 text-amber-300" },
-  { value: "balance_paid", label: "Solde réglé", className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" },
+  { value: "quote_sent", label: "Devis envoyé", className: "border-foreground/15 text-foreground/85" },
+  { value: "deposit_paid", label: "Acompte payé", className: "border-sky-400/30 bg-sky-400/10 text-sky-700 dark:text-sky-300" },
+  { value: "in_delivery", label: "En cours de livraison", className: "border-violet-400/30 bg-violet-400/10 text-violet-700 dark:text-violet-300" },
+  { value: "balance_due", label: "Solde à régler", className: "border-amber-400/30 bg-amber-400/10 text-amber-700 dark:text-amber-300" },
+  { value: "balance_paid", label: "Solde réglé", className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-700 dark:text-emerald-300" },
 ]
 
 export const HEALTH: Option<ProjectHealth>[] = [

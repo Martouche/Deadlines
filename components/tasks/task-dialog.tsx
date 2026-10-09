@@ -45,7 +45,7 @@ export function TaskDialog({ task, labels, isAdmin, currentUserId }: TaskDialogP
             <Checklist taskId={task.id} items={task.checklist} isAdmin={isAdmin} />
             <CommentThread taskId={task.id} comments={task.comments} currentUserId={currentUserId} isAdmin={isAdmin} />
           </div>
-          <aside className="flex flex-col gap-6 border-t border-white/10 bg-white/[0.02] p-6 md:border-t-0 md:border-l">
+          <aside className="flex flex-col gap-6 border-t border-border bg-foreground/[0.02] p-6 md:border-t-0 md:border-l">
             <Properties task={task} labels={labels} isAdmin={isAdmin} />
             <Validation task={task} isAdmin={isAdmin} />
             {isAdmin && (
@@ -153,7 +153,7 @@ function Description({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) 
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="w-full rounded-lg border border-dashed border-white/10 px-3 py-6 text-sm text-muted-foreground transition-colors hover:border-white/20"
+          className="w-full rounded-lg border border-dashed border-border px-3 py-6 text-sm text-muted-foreground transition-colors hover:border-foreground/20"
         >
           Ajouter une description
         </button>
@@ -260,11 +260,11 @@ function Validation({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
 
   if (task.client_validated_at) {
     return (
-      <div className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-300">
+      <div className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-700 dark:text-emerald-300">
         <p className="flex items-center gap-1.5 font-medium">
           <CheckCheck className="size-4" /> Validée par le client
         </p>
-        <p className="mt-1 text-xs text-emerald-300/80">le {formatDate(task.client_validated_at, "d MMMM yyyy 'à' HH:mm")}</p>
+        <p className="mt-1 text-xs text-emerald-700/80 dark:text-emerald-300/80">le {formatDate(task.client_validated_at, "d MMMM yyyy 'à' HH:mm")}</p>
       </div>
     )
   }
@@ -273,7 +273,7 @@ function Validation({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
 
   if (isAdmin) {
     return (
-      <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-xs text-amber-300">
+      <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-xs text-amber-700 dark:text-amber-300">
         En attente de validation par le client.
       </p>
     )
@@ -281,7 +281,7 @@ function Validation({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3">
-      <p className="text-xs text-amber-200">Cette étape attend ta validation.</p>
+      <p className="text-xs text-amber-800 dark:text-amber-200">Cette étape attend ta validation.</p>
       <Button disabled={pending} onClick={() => run(() => validateTask(task.id), { success: "Étape validée, merci !" })}>
         {pending ? <Loader2 className="animate-spin" /> : <CheckCheck />}
         Valider cette étape

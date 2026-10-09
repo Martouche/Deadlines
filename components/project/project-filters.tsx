@@ -32,7 +32,7 @@ export function ProjectFilters({ query, counts, clients }: ProjectFiltersProps) 
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <nav className="inline-flex rounded-lg border border-white/10 p-0.5" aria-label="Vues">
+      <nav className="inline-flex rounded-lg border border-border p-0.5" aria-label="Vues">
         {PROJECT_VIEWS.map((v) => {
           const active = query.view === v.value
           return (
@@ -49,7 +49,7 @@ export function ProjectFilters({ query, counts, clients }: ProjectFiltersProps) 
               {active && (
                 <motion.span
                   layoutId="project-view-active"
-                  className="absolute inset-0 rounded-md bg-white/[0.08]"
+                  className="absolute inset-0 rounded-md bg-foreground/[0.08]"
                   transition={{ type: "spring", stiffness: 500, damping: 35 }}
                 />
               )}

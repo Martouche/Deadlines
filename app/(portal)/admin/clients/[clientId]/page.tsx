@@ -78,7 +78,7 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
       <div className="grid gap-10 lg:grid-cols-2">
         <section className="flex flex-col gap-4">
           <h2 className="text-sm font-medium text-muted-foreground">Informations</h2>
-          <div className="rounded-xl border border-white/10 p-5">
+          <div className="rounded-xl border border-border p-5">
             <ClientForm
               key={client.updated_at}
               action={updateClientRecord.bind(null, client.id)}
@@ -100,7 +100,7 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
                 <Plus /> Nouveau projet
               </Link>
             </div>
-            <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+            <ul className="divide-y divide-border rounded-xl border border-border">
               {(projects ?? []).length === 0 && (
                 <li className="px-4 py-6 text-center text-sm text-muted-foreground">Aucun projet.</li>
               )}
@@ -108,7 +108,7 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
                 <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}`}
-                    className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-white/[0.03]"
+                    className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-foreground/[0.03]"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{p.title}</p>
@@ -126,7 +126,7 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
           <section className="flex flex-col gap-4">
             <h2 className="text-sm font-medium text-muted-foreground">Accès au portail</h2>
             {(users ?? []).length > 0 && (
-              <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+              <ul className="divide-y divide-border rounded-xl border border-border">
                 {(users ?? []).map((u) => (
                   <li key={u.id} className="px-4 py-3">
                     <p className="text-sm font-medium">{displayName(u)}</p>
@@ -140,7 +140,7 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
                 ))}
               </ul>
             )}
-            <div className="rounded-xl border border-white/10 p-5">
+            <div className="rounded-xl border border-border p-5">
               <InviteForm
                 clientId={client.id}
                 defaultEmail={(users ?? []).length === 0 ? client.email : ""}

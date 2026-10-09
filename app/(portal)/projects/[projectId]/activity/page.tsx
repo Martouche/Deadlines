@@ -44,10 +44,10 @@ export default async function ActivityPage({ params }: PageProps<"/projects/[pro
       {[...days.entries()].map(([day, entries]) => (
         <section key={day}>
           <h3 className="mb-3 text-sm font-medium text-muted-foreground">{formatDate(day, "EEEE d MMMM yyyy")}</h3>
-          <ol className="relative flex flex-col gap-4 border-l border-white/10 pl-5">
+          <ol className="relative flex flex-col gap-4 border-l border-border pl-5">
             {entries.map((log) => (
               <li key={log.id} className="relative">
-                <span className="absolute top-1.5 -left-[23.5px] size-2 rounded-full border border-white/20 bg-background" />
+                <span className="absolute top-1.5 -left-[23.5px] size-2 rounded-full border border-foreground/20 bg-background" />
                 <p className="text-sm">{formatActivity(log)}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {formatDate(log.created_at, "HH:mm")} · {formatRelative(log.created_at)}

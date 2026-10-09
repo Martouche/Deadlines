@@ -12,7 +12,7 @@ export function FinancialBadge({ status }: { status: FinancialStatus }) {
 export function HealthBadge({ health }: { health: ProjectHealth }) {
   const o = optionOf(HEALTH, health)
   return (
-    <span className={cn(pill, "border-white/10 text-zinc-300")}>
+    <span className={cn(pill, "border-border text-foreground/85")}>
       <span className={cn("size-1.5 rounded-full", o.className)} />
       {o.label}
     </span>
@@ -32,7 +32,7 @@ export function PriorityBadge({ priority }: { priority: TaskPriority }) {
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {
   const o = optionOf(TASK_STATUSES, status)
   return (
-    <span className={cn(pill, "border-white/10 text-zinc-300")}>
+    <span className={cn(pill, "border-border text-foreground/85")}>
       <span className={cn("size-1.5 rounded-full", o.className)} />
       {o.label}
     </span>
@@ -46,7 +46,7 @@ export function ProgressBar({ value, className }: { value: number; className?: s
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={100}
-      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]", className)}
+      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-foreground/[0.06]", className)}
     >
       <div className="h-full rounded-full bg-foreground transition-[width]" style={{ width: `${value}%` }} />
     </div>

@@ -34,8 +34,8 @@ export function Checklist({ taskId, items, isAdmin }: { taskId: string; items: C
               aria-label={item.is_done ? "Marquer comme à faire" : "Marquer comme fait"}
               className={cn(
                 "flex size-4 shrink-0 items-center justify-center rounded border transition-colors",
-                item.is_done ? "border-emerald-400 bg-emerald-400 text-black" : "border-white/25",
-                isAdmin && "hover:border-white/50",
+                item.is_done ? "border-emerald-400 bg-emerald-400 text-black" : "border-foreground/25",
+                isAdmin && "hover:border-foreground/50",
               )}
             >
               {item.is_done && <Check className="size-3" strokeWidth={3} />}

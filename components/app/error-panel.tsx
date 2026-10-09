@@ -28,13 +28,13 @@ export function ErrorPanel({ error, retry }: ErrorPanelProps) {
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-16">
-      <div className="w-full max-w-lg rounded-xl border border-white/10 bg-card p-6">
+      <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6">
         <h1 className="font-heading text-2xl font-semibold tracking-tight">Une erreur est survenue</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           L&apos;erreur a été enregistrée dans les logs. Réessaie ; si elle persiste, transmets la référence ci-dessous.
         </p>
         {detail && (
-          <pre className="mt-4 overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-3 font-mono text-xs whitespace-pre-wrap text-red-300">
+          <pre className="mt-4 overflow-x-auto rounded-lg border border-border bg-muted/70 p-3 font-mono text-xs whitespace-pre-wrap text-red-700 dark:text-red-300">
             {detail}
           </pre>
         )}

@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
 
+import { ThemeToggle } from "@/components/app/theme-toggle"
 import { AuthShell } from "@/components/auth/auth-shell"
 import { HashSessionHandler } from "@/components/auth/hash-session-handler"
 import { LoginForm } from "@/components/auth/login-form"
 import { safeNextPath } from "@/lib/safe-redirect"
+import { getTheme } from "@/lib/theme"
 
 export const metadata: Metadata = { title: "Connexion" }
 
@@ -17,7 +19,11 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const errorMessage = typeof error === "string" ? ERRORS[error] : undefined
 
   return (
-    <AuthShell title="Connexion" subtitle="Accède au suivi de ton projet, aux livrables et aux échanges.">
+    <AuthShell
+      title="Connexion"
+      subtitle="Accède au suivi de ton projet, aux livrables et aux échanges."
+      toolbar={<ThemeToggle theme={await getTheme()} />}
+    >
       <HashSessionHandler />
       <LoginForm next={nextPath} initialError={errorMessage} />
     </AuthShell>

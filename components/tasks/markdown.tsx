@@ -10,16 +10,16 @@ const components: Components = {
   ul: (props) => <ul className="my-2 list-disc space-y-1 pl-5" {...props} />,
   ol: (props) => <ol className="my-2 list-decimal space-y-1 pl-5" {...props} />,
   a: (props) => <a className="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer" {...props} />,
-  blockquote: (props) => <blockquote className="my-2 border-l-2 border-white/15 pl-3 text-muted-foreground" {...props} />,
-  code: (props) => <code className="rounded bg-white/[0.06] px-1 py-0.5 font-mono text-[0.85em]" {...props} />,
-  pre: (props) => <pre className="my-2 overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-3 [&_code]:bg-transparent [&_code]:p-0" {...props} />,
-  table: (props) => <table className="my-2 w-full text-left text-sm [&_td]:border-t [&_td]:border-white/10 [&_td]:py-1.5 [&_th]:py-1.5" {...props} />,
-  hr: () => <hr className="my-4 border-white/10" />,
+  blockquote: (props) => <blockquote className="my-2 border-l-2 border-foreground/15 pl-3 text-muted-foreground" {...props} />,
+  code: (props) => <code className="rounded bg-foreground/[0.06] px-1 py-0.5 font-mono text-[0.85em]" {...props} />,
+  pre: (props) => <pre className="my-2 overflow-x-auto rounded-lg border border-border bg-muted/70 p-3 [&_code]:bg-transparent [&_code]:p-0" {...props} />,
+  table: (props) => <table className="my-2 w-full text-left text-sm [&_td]:border-t [&_td]:border-border [&_td]:py-1.5 [&_th]:py-1.5" {...props} />,
+  hr: () => <hr className="my-4 border-border" />,
 }
 
 export function Markdown({ children }: { children: string }) {
   return (
-    <div className="text-sm text-zinc-300">
+    <div className="text-sm text-foreground/85">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {children}
       </ReactMarkdown>

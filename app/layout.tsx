@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google"
 
 import { Toaster } from "@/components/ui/sonner"
+import { getTheme } from "@/lib/theme"
 import "./globals.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
@@ -14,15 +15,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Thème lu côté serveur (cookie) : la page arrive déjà dans le bon thème, sans flash.
+  const theme = await getTheme()
+
   return (
     <html
       lang="fr"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
+      style={{ colorScheme: theme }}
+      className={`${theme === "dark" ? "dark " : ""}${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {children}
-        <Toaster theme="dark" position="bottom-right" />
+        <Toaster theme={theme} position="bottom-right" />
       </body>
     </html>
   )

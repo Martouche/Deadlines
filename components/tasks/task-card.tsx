@@ -27,7 +27,7 @@ export function TaskCard({ task, labels, href }: TaskCardProps) {
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
         {task.priority !== "medium" && <PriorityBadge priority={task.priority} />}
         {task.deadline && (
-          <span className={cn("inline-flex items-center gap-1", overdue && "text-red-300")}>
+          <span className={cn("inline-flex items-center gap-1", overdue && "text-red-700 dark:text-red-300")}>
             <CalendarClock className="size-3" />
             {formatDeadline(task.deadline)}
           </span>
@@ -45,7 +45,7 @@ export function TaskCard({ task, labels, href }: TaskCardProps) {
           </span>
         )}
         {task.client_validated_at && (
-          <span className="inline-flex items-center gap-1 text-emerald-300">
+          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
             <CheckCheck className="size-3" />
             Validée
           </span>

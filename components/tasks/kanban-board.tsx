@@ -70,7 +70,7 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
         {TASK_STATUSES.map((s) => {
           const cards = column(s.value)
           return (
-            <section key={s.value} className="flex w-72 shrink-0 flex-col rounded-xl border border-white/10 bg-white/[0.02]">
+            <section key={s.value} className="flex w-72 shrink-0 flex-col rounded-xl border border-border bg-foreground/[0.02]">
               <header className="flex items-center gap-2 px-3 pt-3 pb-2">
                 <span className={cn("size-2 rounded-full", s.className)} />
                 <h3 className="text-sm font-medium">{s.label}</h3>
@@ -84,7 +84,7 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
                     {...provided.droppableProps}
                     className={cn(
                       "flex min-h-24 flex-1 flex-col gap-2 rounded-b-xl px-2 pb-2 transition-colors",
-                      snapshot.isDraggingOver && "bg-white/[0.03]",
+                      snapshot.isDraggingOver && "bg-foreground/[0.03]",
                     )}
                   >
                     {cards.map((task, index) => (
@@ -95,8 +95,8 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
                             {...drag.draggableProps}
                             {...drag.dragHandleProps}
                             className={cn(
-                              "rounded-lg border border-white/10 bg-card p-3 transition-colors hover:border-white/20",
-                              dragSnapshot.isDragging && "border-white/25 shadow-2xl shadow-black/60",
+                              "rounded-lg border border-border bg-card p-3 transition-colors hover:border-foreground/20",
+                              dragSnapshot.isDragging && "border-foreground/25 shadow-2xl shadow-black/20 dark:shadow-black/60",
                             )}
                           >
                             <TaskCard task={task} labels={labels} href={taskLink(task.id)} />
@@ -126,7 +126,7 @@ function QuickAdd({ projectId, status }: { projectId: string; status: TaskStatus
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+        className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:bg-foreground/[0.04] hover:text-foreground"
       >
         <Plus className="size-3.5" /> Ajouter une tâche
       </button>

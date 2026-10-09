@@ -27,7 +27,7 @@ export function MainNav({ items }: { items: NavItem[] }) {
             {active && (
               <motion.span
                 layoutId="main-nav-active"
-                className="absolute inset-0 rounded-md bg-white/[0.06]"
+                className="absolute inset-0 rounded-md bg-foreground/[0.06]"
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
             )}

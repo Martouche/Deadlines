@@ -22,7 +22,7 @@ export function ProjectTabs({ projectId, isAdmin }: { projectId: string; isAdmin
   ]
 
   return (
-    <nav className="-mb-px flex gap-1 overflow-x-auto border-b border-white/10">
+    <nav className="-mb-px flex gap-1 overflow-x-auto border-b border-border">
       {tabs.map((tab) => {
         const active = pathname === tab.href
         return (

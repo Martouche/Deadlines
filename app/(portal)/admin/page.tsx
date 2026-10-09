@@ -78,14 +78,14 @@ export default async function AdminDashboardPage() {
         }
       />
 
-      <dl className="grid grid-cols-2 divide-white/10 overflow-hidden rounded-xl border border-white/10 lg:grid-cols-4 lg:divide-x">
+      <dl className="grid grid-cols-2 divide-border overflow-hidden rounded-xl border border-border lg:grid-cols-4 lg:divide-x">
         {stats.map((s) => (
-          <div key={s.label} className="border-white/10 p-5 max-lg:odd:border-r max-lg:[&:nth-child(-n+2)]:border-b">
+          <div key={s.label} className="border-border p-5 max-lg:odd:border-r max-lg:[&:nth-child(-n+2)]:border-b">
             <dt className="text-xs text-muted-foreground">{s.label}</dt>
             <dd
               className={cn(
                 "mt-2 font-heading text-3xl font-semibold tracking-tight",
-                s.alert && s.value !== "0" && "text-red-300",
+                s.alert && s.value !== "0" && "text-red-700 dark:text-red-300",
               )}
             >
               {s.value}
@@ -118,7 +118,7 @@ export default async function AdminDashboardPage() {
 
         <section>
           <h2 className="mb-4 text-sm font-medium text-muted-foreground">Échéances des 14 prochains jours</h2>
-          <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+          <ul className="divide-y divide-border rounded-xl border border-border">
             {(upcoming ?? []).length === 0 && (
               <li className="px-4 py-6 text-center text-sm text-muted-foreground">Rien à l&apos;horizon.</li>
             )}
@@ -126,7 +126,7 @@ export default async function AdminDashboardPage() {
               <li key={t.id}>
                 <Link
                   href={`/projects/${t.project_id}?task=${t.id}`}
-                  className="flex items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-white/[0.03]"
+                  className="flex items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-foreground/[0.03]"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm">{t.title}</p>
@@ -136,7 +136,7 @@ export default async function AdminDashboardPage() {
                     <span
                       className={cn(
                         "text-xs",
-                        t.deadline < format(today, "yyyy-MM-dd") ? "text-red-300" : "text-muted-foreground",
+                        t.deadline < format(today, "yyyy-MM-dd") ? "text-red-700 dark:text-red-300" : "text-muted-foreground",
                       )}
                     >
                       {formatDeadline(t.deadline)}

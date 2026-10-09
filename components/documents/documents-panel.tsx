@@ -75,7 +75,7 @@ export function DocumentsPanel({ projectId, documents, isAdmin }: DocumentsPanel
           description={isAdmin ? "Dépose le cahier des charges, les factures, les liens Figma ou de recette." : "Les livrables apparaîtront ici."}
         />
       ) : (
-        <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+        <ul className="divide-y divide-border rounded-xl border border-border">
           {documents.map((doc) => (
             <DocumentRow key={doc.id} doc={doc} isAdmin={isAdmin} />
           ))}
@@ -100,7 +100,7 @@ function DocumentRow({ doc, isAdmin }: { doc: ProjectDocument; isAdmin: boolean 
 
   return (
     <li className="flex items-center gap-4 px-4 py-3">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03]">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-foreground/[0.03]">
         <Icon className="size-4 text-muted-foreground" />
       </span>
       <div className="min-w-0 flex-1">

@@ -30,7 +30,7 @@ export function TasksView({ projectId, tasks, labels, isAdmin, view }: TasksView
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="inline-flex w-fit rounded-lg border border-white/10 p-0.5">
+      <div className="inline-flex w-fit rounded-lg border border-border p-0.5">
         {VIEWS.map((v) => (
           <Link
             key={v.value}
@@ -44,7 +44,7 @@ export function TasksView({ projectId, tasks, labels, isAdmin, view }: TasksView
             {view === v.value && (
               <motion.span
                 layoutId="tasks-view-active"
-                className="absolute inset-0 rounded-md bg-white/[0.08]"
+                className="absolute inset-0 rounded-md bg-foreground/[0.08]"
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
             )}

@@ -45,7 +45,7 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
     <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-medium text-muted-foreground">Projet</h2>
-        <div className="rounded-xl border border-white/10 p-6">
+        <div className="rounded-xl border border-border p-6">
           {/*
             key : recrée le formulaire après chaque enregistrement. Sans ça, React remet
             les <select> non contrôlés sur leur valeur du premier affichage (le statut
@@ -74,7 +74,7 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
         </section>
 
         <section className="flex flex-col gap-3 rounded-xl border border-red-400/20 p-5">
-          <h2 className="text-sm font-medium text-red-300">Zone sensible</h2>
+          <h2 className="text-sm font-medium text-red-700 dark:text-red-300">Zone sensible</h2>
           <p className="text-xs text-muted-foreground">
             Supprime le projet, ses tâches, commentaires, documents (fichiers compris), temps et journal.
           </p>

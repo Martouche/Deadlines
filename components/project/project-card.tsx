@@ -20,7 +20,7 @@ export function ProjectCard({ project, showClient }: { project: ProjectOverview;
     >
       <Link
         href={`/projects/${project.id}`}
-        className="flex h-full flex-col rounded-xl border border-white/10 bg-card p-5 transition-colors hover:border-white/20"
+        className="flex h-full flex-col rounded-xl border border-border bg-card p-5 transition-colors hover:border-foreground/20"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -32,7 +32,7 @@ export function ProjectCard({ project, showClient }: { project: ProjectOverview;
             <h3 className="mt-1 truncate font-heading text-lg font-semibold tracking-tight">{project.title}</h3>
           </div>
           {closed ? (
-            <span className="rounded-full border border-white/10 px-2 py-0.5">
+            <span className="rounded-full border border-border px-2 py-0.5">
               <ProjectStatusLabel status={project.status} />
             </span>
           ) : (
@@ -54,13 +54,13 @@ export function ProjectCard({ project, showClient }: { project: ProjectOverview;
             {closed ? formatDate(project.deadline) : formatDeadline(project.next_deadline ?? project.deadline)}
           </span>
           {!closed && project.overdue_tasks > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-red-300">
+            <span className="inline-flex items-center gap-1.5 text-red-700 dark:text-red-300">
               <AlertTriangle className="size-3.5" />
               {project.overdue_tasks} en retard
             </span>
           )}
           {!closed && project.awaiting_validation > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-amber-300">
+            <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
               <CheckCircle2 className="size-3.5" />
               {project.awaiting_validation} à valider
             </span>

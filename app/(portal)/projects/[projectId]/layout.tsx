@@ -28,7 +28,7 @@ export default async function ProjectLayout({ children, params }: LayoutProps<"/
           </div>
         </div>
 
-        <div className="grid gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-3">
+        <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3">
           <div className="bg-background p-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Avancement</span>

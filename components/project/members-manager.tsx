@@ -27,7 +27,7 @@ export function MembersManager({ projectId, clientId, members, candidates }: Mem
 
   return (
     <div className="flex flex-col gap-4">
-      <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+      <ul className="divide-y divide-border rounded-xl border border-border">
         {members.length === 0 && (
           <li className="px-4 py-5 text-center text-sm text-muted-foreground">Aucun client n&apos;a encore accès à ce projet.</li>
         )}

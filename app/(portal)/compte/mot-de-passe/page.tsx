@@ -11,7 +11,7 @@ export default function PasswordPage() {
       <p className="mt-2 text-sm text-muted-foreground">
         Facultatif : tu pourras toujours te connecter avec un lien envoyé par e-mail.
       </p>
-      <div className="mt-8 rounded-xl border border-white/10 bg-card p-6">
+      <div className="mt-8 rounded-xl border border-border bg-card p-6">
         <PasswordForm />
       </div>
     </div>

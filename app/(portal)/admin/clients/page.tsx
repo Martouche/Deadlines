@@ -32,10 +32,10 @@ export default async function ClientsPage() {
       {clients.length === 0 ? (
         <EmptyState icon={Users} title="Aucun client" description="Ajoute ton premier client pour lui créer un projet." />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-white/10">
+        <div className="overflow-hidden rounded-xl border border-border">
           <Table>
             <TableHeader>
-              <TableRow className="border-white/10 hover:bg-transparent">
+              <TableRow className="border-border hover:bg-transparent">
                 <TableHead>Nom</TableHead>
                 <TableHead>Entreprise</TableHead>
                 <TableHead className="hidden md:table-cell">E-mail</TableHead>
@@ -47,7 +47,7 @@ export default async function ClientsPage() {
               {clients.map((c) => {
                 const active = c.projects.filter((p) => p.status === "active").length
                 return (
-                  <TableRow key={c.id} className="border-white/10">
+                  <TableRow key={c.id} className="border-border">
                     <TableCell className="font-medium">
                       <Link href={`/admin/clients/${c.id}`} className="hover:underline">
                         {c.name}

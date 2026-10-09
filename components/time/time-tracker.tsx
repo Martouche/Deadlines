@@ -35,7 +35,7 @@ export function Timer({ projectId, tasks, running }: { projectId: string; tasks:
   const ss = String(elapsed % 60).padStart(2, "0")
 
   return (
-    <div className="flex flex-wrap items-center gap-4 rounded-xl border border-white/10 p-5">
+    <div className="flex flex-wrap items-center gap-4 rounded-xl border border-border p-5">
       <span className="font-mono text-3xl tabular-nums">
         {hh}:{mm}:{ss}
       </span>
@@ -115,11 +115,11 @@ export function ManualEntryForm({ projectId, tasks }: { projectId: string; tasks
 
 export function EntryList({ entries }: { entries: TimeEntry[] }) {
   if (entries.length === 0) {
-    return <p className="rounded-xl border border-white/10 px-4 py-6 text-center text-sm text-muted-foreground">Aucun temps saisi.</p>
+    return <p className="rounded-xl border border-border px-4 py-6 text-center text-sm text-muted-foreground">Aucun temps saisi.</p>
   }
 
   return (
-    <ul className="divide-y divide-white/10 rounded-xl border border-white/10">
+    <ul className="divide-y divide-border rounded-xl border border-border">
       {entries.map((e) => (
         <li key={e.id} className="flex items-center gap-4 px-4 py-3">
           <div className="min-w-0 flex-1">
