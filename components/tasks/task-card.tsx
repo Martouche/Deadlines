@@ -38,11 +38,15 @@ export function TaskCard({ task, labels, href }: TaskCardProps) {
             {task.checklist_done}/{task.checklist_total}
           </span>
         )}
-        {task.comment_count > 0 && (
-          <span className="inline-flex items-center gap-1">
-            <MessageSquare className="size-3" />
-            {task.comment_count}
-          </span>
+        {task.unread > 0 ? (
+          <UnreadBadge count={task.unread} />
+        ) : (
+          task.comment_count > 0 && (
+            <span className="inline-flex items-center gap-1">
+              <MessageSquare className="size-3" />
+              {task.comment_count}
+            </span>
+          )
         )}
         {task.client_validated_at && (
           <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
@@ -52,5 +56,17 @@ export function TaskCard({ task, labels, href }: TaskCardProps) {
         )}
       </div>
     </Link>
+  )
+}
+
+export function UnreadBadge({ count }: { count: number }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full bg-sky-500 px-1.5 py-0.5 font-medium text-white"
+      title={`${count} nouveau${count > 1 ? "x" : ""} message${count > 1 ? "s" : ""}`}
+    >
+      <MessageSquare className="size-3" />
+      {count} nouveau{count > 1 ? "x" : ""}
+    </span>
   )
 }

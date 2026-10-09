@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react"
 import { Loader2, Send, Trash2 } from "lucide-react"
 
 import { useAction } from "@/components/app/use-action"
+import { Markdown } from "@/components/tasks/markdown"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { addComment, deleteComment } from "@/lib/actions/comments"
@@ -59,7 +60,9 @@ export function CommentThread({ taskId, comments, currentUserId, isAdmin }: Comm
                   </button>
                 )}
               </div>
-              <p className="mt-1.5 text-sm whitespace-pre-wrap text-foreground/85">{c.body}</p>
+              <div className="mt-1.5">
+                <Markdown breaks>{c.body}</Markdown>
+              </div>
             </motion.li>
           ))}
         </AnimatePresence>
@@ -71,7 +74,7 @@ export function CommentThread({ taskId, comments, currentUserId, isAdmin }: Comm
           name="body"
           required
           rows={3}
-          placeholder="Écrire un message… (Ctrl + Entrée pour envoyer)"
+          placeholder="Écrire un message… Markdown accepté : **gras**, listes, [liens](https://…). Ctrl + Entrée pour envoyer."
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) e.currentTarget.form?.requestSubmit()
           }}

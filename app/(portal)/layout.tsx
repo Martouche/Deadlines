@@ -2,6 +2,7 @@ import Link from "next/link"
 import { LogOut } from "lucide-react"
 
 import { MainNav, type NavItem } from "@/components/app/main-nav"
+import { SearchBox } from "@/components/app/search-box"
 import { ThemeToggle } from "@/components/app/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { signOut } from "@/lib/actions/account"
@@ -13,10 +14,14 @@ const ADMIN_NAV: NavItem[] = [
   { href: "/admin", label: "Tableau de bord", exact: true },
   { href: "/admin/clients", label: "Clients" },
   { href: "/projects", label: "Projets" },
+  { href: "/echeances", label: "Échéances" },
   { href: "/admin/logs", label: "Logs" },
 ]
 
-const CLIENT_NAV: NavItem[] = [{ href: "/projects", label: "Mes projets" }]
+const CLIENT_NAV: NavItem[] = [
+  { href: "/projects", label: "Mes projets" },
+  { href: "/echeances", label: "Échéances" },
+]
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const [profile, theme] = await Promise.all([requireUser(), getTheme()])
@@ -31,6 +36,7 @@ export default async function PortalLayout({ children }: { children: React.React
           </Link>
           <MainNav items={isAdmin ? ADMIN_NAV : CLIENT_NAV} />
           <div className="ml-auto flex items-center gap-2">
+            <SearchBox />
             <ThemeToggle theme={theme} />
             <Link
               href="/compte/mot-de-passe"

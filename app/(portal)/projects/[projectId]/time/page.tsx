@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { Download } from "lucide-react"
 
 import { EntryList, ManualEntryForm, Timer } from "@/components/time/time-tracker"
+import { buttonVariants } from "@/components/ui/button"
 import { read } from "@/lib/data"
 import { formatMinutes, formatMoney } from "@/lib/format"
 import { getProject } from "@/lib/projects"
@@ -88,7 +90,15 @@ export default async function TimePage({ params }: PageProps<"/projects/[project
             </section>
           )}
           <section>
-            <h2 className="mb-3 text-sm font-medium text-muted-foreground">Historique</h2>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-medium text-muted-foreground">Historique</h2>
+              {done.length > 0 && (
+                // Lien direct (pas <Link>) : c'est un téléchargement, pas une navigation.
+                <a href={`/projects/${projectId}/time/export`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+                  <Download /> Exporter en CSV
+                </a>
+              )}
+            </div>
             <EntryList entries={all} />
           </section>
         </div>

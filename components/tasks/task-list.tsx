@@ -4,38 +4,13 @@ import Link from "next/link"
 import { CheckCheck } from "lucide-react"
 
 import { PriorityBadge, TaskStatusBadge } from "@/components/project/status-badges"
+import { UnreadBadge } from "@/components/tasks/task-card"
 import { LabelList } from "@/components/tasks/task-labels"
 import { useTaskLink } from "@/components/tasks/use-task-link"
-import { daysUntil, formatDate, formatDeadline } from "@/lib/format"
+import { formatDate, formatDeadline } from "@/lib/format"
+import { groupByDeadline } from "@/lib/task-groups"
 import type { Label, TaskCardData } from "@/lib/types"
 import { cn } from "@/lib/utils"
-
-type Group = { key: string; title: string; tasks: TaskCardData[] }
-
-/** Vue « timeline » : tâches regroupées par échéance. */
-function groupByDeadline(tasks: TaskCardData[]): Group[] {
-  const groups: Group[] = [
-    { key: "overdue", title: "En retard", tasks: [] },
-    { key: "week", title: "Cette semaine", tasks: [] },
-    { key: "month", title: "Dans le mois", tasks: [] },
-    { key: "later", title: "Plus tard", tasks: [] },
-    { key: "none", title: "Sans échéance", tasks: [] },
-    { key: "done", title: "Terminées", tasks: [] },
-  ]
-  const byKey = new Map(groups.map((g) => [g.key, g]))
-  const sorted = [...tasks].sort((a, b) => (a.deadline ?? "9999").localeCompare(b.deadline ?? "9999"))
-
-  for (const task of sorted) {
-    let key = "none"
-    if (task.status === "done") key = "done"
-    else if (task.deadline) {
-      const days = daysUntil(task.deadline)
-      key = days < 0 ? "overdue" : days <= 7 ? "week" : days <= 31 ? "month" : "later"
-    }
-    byKey.get(key)!.tasks.push(task)
-  }
-  return groups.filter((g) => g.tasks.length > 0)
-}
 
 export function TaskList({ tasks, labels }: { tasks: TaskCardData[]; labels: Map<string, Label> }) {
   const taskLink = useTaskLink()
@@ -65,6 +40,7 @@ export function TaskList({ tasks, labels }: { tasks: TaskCardData[]; labels: Map
                     <LabelList ids={task.label_ids} labels={labels} />
                   </span>
                   <span className="flex items-center gap-2">
+                    {task.unread > 0 && <UnreadBadge count={task.unread} />}
                     {task.client_validated_at && <CheckCheck className="size-4 text-emerald-700 dark:text-emerald-300" aria-label="Validée" />}
                     <PriorityBadge priority={task.priority} />
                   </span>

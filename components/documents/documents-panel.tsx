@@ -169,7 +169,7 @@ function UploadDialog({ projectId }: { projectId: string }) {
 
         const safeName = file.name
           .normalize("NFD")
-          .replace(/[̀-ͯ]/g, "")
+          .replace(/[\u0300-\u036f]/g, "")
           .replace(/[^w.-]+/g, "-")
         const path = `${projectId}/${crypto.randomUUID()}-${safeName}`
         // Envoi direct navigateur → Storage : un échec n'atteint pas le serveur, on le lui signale.

@@ -9,9 +9,10 @@ import { useAction } from "@/components/app/use-action"
 import { TaskCard } from "@/components/tasks/task-card"
 import { useTaskLink } from "@/components/tasks/use-task-link"
 import { Input } from "@/components/ui/input"
-import { createTask, moveTask } from "@/lib/actions/tasks"
-import { TASK_STATUSES } from "@/lib/constants"
-import type { Label, TaskCardData, TaskStatus } from "@/lib/types"
+import { NativeSelect } from "@/components/ui/native-select"
+import { createTask, moveTask, updateTask } from "@/lib/actions/tasks"
+import { TASK_PRIORITIES, TASK_STATUSES } from "@/lib/constants"
+import type { Label, TaskCardData, TaskPriority, TaskStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const STEP = 1024
@@ -23,6 +24,8 @@ type KanbanBoardProps = {
   tasks: TaskCardData[]
   labels: Map<string, Label>
   isAdmin: boolean
+  /** Colonne « Terminé » masquée. */
+  hideDone: boolean
 }
 
 /** Position fractionnaire entre les deux voisines : une seule ligne modifiée par déplacement. */
@@ -33,7 +36,7 @@ function positionBetween(prev?: TaskCardData, next?: TaskCardData) {
   return (prev.position + next.position) / 2
 }
 
-export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardProps) {
+export function KanbanBoard({ projectId, tasks, labels, isAdmin, hideDone }: KanbanBoardProps) {
   const taskLink = useTaskLink()
   const [, startTransition] = useTransition()
   const [items, applyMove] = useOptimistic(tasks, (state, move: Move) =>
@@ -67,7 +70,7 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-0">
-        {TASK_STATUSES.map((s) => {
+        {TASK_STATUSES.filter((s) => !hideDone || s.value !== "done").map((s) => {
           const cards = column(s.value)
           return (
             <section key={s.value} className="flex w-72 shrink-0 flex-col rounded-xl border border-border bg-foreground/[0.02]">
@@ -95,11 +98,12 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
                             {...drag.draggableProps}
                             {...drag.dragHandleProps}
                             className={cn(
-                              "rounded-lg border border-border bg-card p-3 transition-colors hover:border-foreground/20",
+                              "group rounded-lg border border-border bg-card p-3 transition-colors hover:border-foreground/20",
                               dragSnapshot.isDragging && "border-foreground/25 shadow-2xl shadow-black/20 dark:shadow-black/60",
                             )}
                           >
                             <TaskCard task={task} labels={labels} href={taskLink(task.id)} />
+                            {isAdmin && <QuickEdit task={task} />}
                           </div>
                         )}
                       </Draggable>
@@ -152,5 +156,40 @@ function QuickAdd({ projectId, status }: { projectId: string; status: TaskStatus
         className="h-8 text-sm"
       />
     </form>
+  )
+}
+
+/**
+ * Priorité et échéance modifiables sans ouvrir la fiche. Visibles au survol ou au
+ * clavier (focus) ; les champs de formulaire ne déclenchent pas le glisser-déposer.
+ */
+function QuickEdit({ task }: { task: TaskCardData }) {
+  const { pending, run } = useAction()
+
+  return (
+    <div className="grid max-h-0 grid-cols-2 gap-1.5 overflow-hidden opacity-0 transition-all group-focus-within:mt-2 group-focus-within:max-h-10 group-focus-within:opacity-100 group-hover:mt-2 group-hover:max-h-10 group-hover:opacity-100 max-md:mt-2 max-md:max-h-10 max-md:opacity-100">
+      <NativeSelect
+        aria-label="Priorité"
+        value={task.priority}
+        disabled={pending}
+        onChange={(e) => run(() => updateTask(task.id, { priority: e.target.value as TaskPriority }))}
+        className="h-7 pr-6 pl-2 text-xs"
+      >
+        {TASK_PRIORITIES.map((p) => (
+          <option key={p.value} value={p.value}>
+            {p.label}
+          </option>
+        ))}
+      </NativeSelect>
+      <Input
+        type="date"
+        aria-label="Échéance"
+        key={task.deadline ?? "aucune"}
+        defaultValue={task.deadline ?? ""}
+        disabled={pending}
+        onChange={(e) => run(() => updateTask(task.id, { deadline: e.target.value || null }))}
+        className="h-7 px-2 text-xs"
+      />
+    </div>
   )
 }

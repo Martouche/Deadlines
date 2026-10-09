@@ -1,4 +1,5 @@
 import ReactMarkdown, { type Components } from "react-markdown"
+import remarkBreaks from "remark-breaks"
 import remarkGfm from "remark-gfm"
 
 // Pas de rehype-raw : le HTML brut n'est jamais interprété.
@@ -17,10 +18,16 @@ const components: Components = {
   hr: () => <hr className="my-4 border-border" />,
 }
 
-export function Markdown({ children }: { children: string }) {
+type MarkdownProps = {
+  children: string
+  /** Un retour à la ligne simple reste un retour à la ligne (messages de discussion). */
+  breaks?: boolean
+}
+
+export function Markdown({ children, breaks = false }: MarkdownProps) {
   return (
     <div className="text-sm text-foreground/85">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={breaks ? [remarkGfm, remarkBreaks] : [remarkGfm]} components={components}>
         {children}
       </ReactMarkdown>
     </div>

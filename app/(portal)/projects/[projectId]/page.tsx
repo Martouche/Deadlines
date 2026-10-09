@@ -1,8 +1,10 @@
+import { RealtimeRefresh } from "@/components/tasks/realtime-refresh"
 import { TaskDialog } from "@/components/tasks/task-dialog"
 import { TasksView, type TasksViewMode } from "@/components/tasks/tasks-view"
 import { read } from "@/lib/data"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
+import { countUnread, getLastReads } from "@/lib/unread"
 import type { Comment, Label, TaskCardData, TaskDetail, TaskPriority, TaskStatus } from "@/lib/types"
 
 type TaskRow = {
@@ -14,7 +16,7 @@ type TaskRow = {
   position: number
   client_validated_at: string | null
   task_labels: { label_id: string }[]
-  task_comments: { count: number }[]
+  task_comments: { created_at: string; author_id: string }[]
   task_checklist_items: { is_done: boolean }[]
 }
 
@@ -26,7 +28,7 @@ type TaskDetailRow = Omit<TaskDetail, "label_ids" | "checklist" | "comments"> & 
 
 export default async function ProjectTasksPage({ params, searchParams }: PageProps<"/projects/[projectId]">) {
   const { projectId } = await params
-  const { view, task: taskId } = await searchParams
+  const { view, task: taskId, terminees } = await searchParams
   const { isAdmin, profile } = await getProject(projectId)
   const supabase = await createClient()
 
@@ -36,7 +38,7 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
       supabase
         .from("tasks")
         .select(
-          "id, title, status, priority, deadline, position, client_validated_at, task_labels(label_id), task_comments(count), task_checklist_items(is_done)",
+          "id, title, status, priority, deadline, position, client_validated_at, task_labels(label_id), task_comments(created_at, author_id), task_checklist_items(is_done)",
         )
         .eq("project_id", projectId)
         .order("position")
@@ -58,6 +60,11 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
       : Promise.resolve(null),
   ])
 
+  const lastReads = await getLastReads(
+    supabase,
+    (rows ?? []).map((t) => t.id),
+  )
+
   const tasks: TaskCardData[] = (rows ?? []).map((t) => ({
     id: t.id,
     title: t.title,
@@ -67,7 +74,9 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
     position: t.position,
     client_validated_at: t.client_validated_at,
     label_ids: t.task_labels.map((l) => l.label_id),
-    comment_count: t.task_comments[0]?.count ?? 0,
+    comment_count: t.task_comments.length,
+    // La tâche ouverte est en train d'être lue : pas de badge.
+    unread: t.id === taskId ? 0 : countUnread(t.task_comments, lastReads.get(t.id), profile.id),
     checklist_total: t.task_checklist_items.length,
     checklist_done: t.task_checklist_items.filter((i) => i.is_done).length,
   }))
@@ -96,7 +105,9 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
         labels={labels ?? []}
         isAdmin={isAdmin}
         view={(view === "list" ? "list" : "kanban") satisfies TasksViewMode}
+        hideDone={terminees === "masquees"}
       />
+      <RealtimeRefresh projectId={projectId} taskIds={tasks.map((t) => t.id)} />
       {task && (
         <TaskDialog key={task.id} task={task} labels={labels ?? []} isAdmin={isAdmin} currentUserId={profile.id} />
       )}

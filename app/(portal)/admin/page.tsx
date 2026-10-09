@@ -110,7 +110,7 @@ export default async function AdminDashboardPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {active.map((p) => (
-                <ProjectCard key={p.id} project={p} showClient />
+                <ProjectCard key={p.id} project={p} showClient canManage />
               ))}
             </div>
           )}

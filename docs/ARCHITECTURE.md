@@ -259,3 +259,14 @@ case 'task.status_changed':
 - **Lectures des pages** : `read(label, requête)` (`lib/data.ts`) journalise et affiche l'échec au lieu d'une page vide.
 - **Navigateur** : `useAction()` / `useFormAction()` affichent toute erreur en toast, y compris serveur injoignable ; `error.tsx` remonte les plantages via `reportClientError`.
 - **Où lire les logs** : `/admin/logs` (table `app_logs`, filtre par niveau, recherche par action ou référence), et la sortie standard en JSON (terminal local, onglet Logs de Vercel).
+
+---
+
+## 5. Fonctionnalités ajoutées (octobre 2026)
+
+- **Échéances** (`/echeances`) : toutes les tâches à faire des projets en cours, groupées par date, filtre client.
+- **Recherche** (`/recherche`, raccourci `/`) : projets, tâches, documents, clients (admin).
+- **Kanban** : masquer les terminées (`?terminees=masquees`), édition rapide priorité/échéance au survol, temps réel (Supabase Realtime), badge « non lu » (table `task_reads`).
+- **Projets** : bouton Terminer/Rouvrir sur les cartes, duplication comme modèle (Paramètres), export CSV du temps (`/projects/[id]/time/export`).
+- **Clients** : accueil avec étapes à valider, prochaine échéance et derniers livrables ; commentaires en Markdown.
+- **E-mails** (`lib/notify.ts`, Resend) : message, étape à valider, étape validée, document ajouté. Désactivés sans `RESEND_API_KEY` / `NOTIFY_FROM`.

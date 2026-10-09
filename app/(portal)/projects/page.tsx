@@ -4,6 +4,7 @@ import { FolderKanban, Plus, SearchX } from "lucide-react"
 
 import { EmptyState } from "@/components/app/empty-state"
 import { PageHeader } from "@/components/app/page-header"
+import { ClientHighlights } from "@/components/project/client-highlights"
 import { ProjectCard } from "@/components/project/project-card"
 import { ProjectFilters } from "@/components/project/project-filters"
 import { buttonVariants } from "@/components/ui/button"
@@ -67,6 +68,7 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
         />
       ) : (
         <>
+          {!isAdmin && <ClientHighlights />}
           <ProjectFilters
             query={query}
             counts={counts}
@@ -83,7 +85,7 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {projects.map((p) => (
-                <ProjectCard key={p.id} project={p} showClient={isAdmin} />
+                <ProjectCard key={p.id} project={p} showClient={isAdmin} canManage={isAdmin} />
               ))}
             </div>
           )}

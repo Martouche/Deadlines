@@ -54,6 +54,8 @@ export type TaskCardData = {
   client_validated_at: string | null
   label_ids: string[]
   comment_count: number
+  /** Commentaires des autres depuis la dernière ouverture de la tâche. */
+  unread: number
   checklist_total: number
   checklist_done: number
 }

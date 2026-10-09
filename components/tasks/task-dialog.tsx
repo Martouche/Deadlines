@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCheck, Eye, Loader2, Pencil, Trash2 } from "lucide-react"
 
@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { Input } from "@/components/ui/input"
 import { NativeSelect } from "@/components/ui/native-select"
 import { Textarea } from "@/components/ui/textarea"
-import { deleteTask, setTaskLabels, updateTask, validateTask, type TaskPatch } from "@/lib/actions/tasks"
+import { deleteTask, markTaskRead, setTaskLabels, updateTask, validateTask, type TaskPatch } from "@/lib/actions/tasks"
 import { TASK_PRIORITIES, TASK_STATUSES } from "@/lib/constants"
 import { formatDate, formatDeadline } from "@/lib/format"
 import type { Label, TaskDetail, TaskPriority, TaskStatus } from "@/lib/types"
@@ -34,6 +34,12 @@ export function TaskDialog({ task, labels, isAdmin, currentUserId }: TaskDialogP
   const router = useRouter()
   const taskLink = useTaskLink()
   const close = () => router.push(taskLink(null), { scroll: false })
+
+  // Ouverture (et chaque nouveau message reçu pendant la lecture) : badge « non lu » remis à zéro.
+  const commentCount = task.comments.length
+  useEffect(() => {
+    markTaskRead(task.id).catch((error) => console.error("[action] tasks.read", error))
+  }, [task.id, commentCount])
 
   return (
     <Dialog open onOpenChange={(open) => !open && close()}>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { Trash2 } from "lucide-react"
 
 import { ConfirmButton } from "@/components/app/confirm-button"
+import { DuplicateProjectForm } from "@/components/project/duplicate-project-form"
 import { MembersManager } from "@/components/project/members-manager"
 import { ProjectForm } from "@/components/project/project-form"
 import { Button } from "@/components/ui/button"
@@ -40,6 +41,7 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
   const members = (memberRows ?? []).flatMap((r) => (r.profile ? [r.profile] : []))
   const memberIds = new Set(members.map((m) => m.id))
   const candidates = (clientUsers ?? []).filter((u) => !memberIds.has(u.id))
+  const clientOptions = (clients ?? []).map((c) => ({ id: c.id, label: c.company ? `${c.company} — ${c.name}` : c.name }))
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
@@ -54,7 +56,7 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
           <ProjectForm
             key={project.updated_at}
             action={updateProject.bind(null, projectId)}
-            clients={(clients ?? []).map((c) => ({ id: c.id, label: c.company ? `${c.company} — ${c.name}` : c.name }))}
+            clients={clientOptions}
             project={project}
             submitLabel="Enregistrer"
             successMessage="Projet mis à jour."
@@ -71,6 +73,24 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
             members={members}
             candidates={candidates}
           />
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-sm font-medium text-muted-foreground">Dupliquer / modèle</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Copie les tâches (remises au backlog, sans échéance), étiquettes et sous-tâches. Astuce : garde des
+              projets « Brouillon » comme modèles réutilisables.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border p-5">
+            <DuplicateProjectForm
+              projectId={projectId}
+              title={project.title}
+              clientId={project.client_id}
+              clients={clientOptions}
+            />
+          </div>
         </section>
 
         <section className="flex flex-col gap-3 rounded-xl border border-red-400/20 p-5">

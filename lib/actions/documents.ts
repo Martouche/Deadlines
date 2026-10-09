@@ -5,8 +5,21 @@ import { refresh } from "next/cache"
 import { formContext, requiredText, text } from "@/lib/actions/form"
 import { ActionError, check, checkRows, runAction } from "@/lib/actions/run"
 import { assertAdmin } from "@/lib/auth"
+import { notify } from "@/lib/notify"
 import { createClient } from "@/lib/supabase/server"
 import type { ActionResult, DocumentKind } from "@/lib/types"
+
+/** Prévient le client qu'un document visible a été ajouté. */
+async function notifyDocument(projectId: string, title: string) {
+  await notify({
+    event: "document",
+    projectId,
+    subject: `Nouveau document : ${title}`,
+    heading: "Un nouveau document est disponible",
+    body: `« ${title} » a été ajouté à l'espace Documents & livrables du projet.`,
+    path: `/projects/${projectId}/documents`,
+  })
+}
 
 export async function addLinkDocument(projectId: string, _prev: ActionResult, formData: FormData): Promise<ActionResult> {
   return runAction("documents.link.add", { projectId, ...formContext(formData) }, async () => {
@@ -25,6 +38,7 @@ export async function addLinkDocument(projectId: string, _prev: ActionResult, fo
       }),
       "Ajout du lien",
     )
+    if (formData.get("visible_to_client") === "on") await notifyDocument(projectId, requiredText(formData, "title", "Le titre"))
     refresh()
   })
 }
@@ -53,6 +67,7 @@ export async function registerUpload(
       await supabase.storage.from("project-files").remove([file.path])
       check({ data: null, error }, "Enregistrement du fichier")
     }
+    if (file.visibleToClient) await notifyDocument(projectId, file.title)
     refresh()
   })
 }

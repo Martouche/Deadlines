@@ -2,18 +2,29 @@
 
 import Link from "next/link"
 import { motion } from "motion/react"
-import { AlertTriangle, CalendarClock, CheckCircle2 } from "lucide-react"
+import { AlertTriangle, CalendarClock, Check, CheckCircle2, Loader2, RotateCcw } from "lucide-react"
 
+import { useAction } from "@/components/app/use-action"
 import { FinancialBadge, HealthBadge, ProgressBar, ProjectStatusLabel } from "@/components/project/status-badges"
+import { Button } from "@/components/ui/button"
+import { setProjectStatus } from "@/lib/actions/projects"
 import { formatDate, formatDeadline } from "@/lib/format"
 import type { ProjectOverview } from "@/lib/types"
 
-export function ProjectCard({ project, showClient }: { project: ProjectOverview; showClient: boolean }) {
+type ProjectCardProps = {
+  project: ProjectOverview
+  showClient: boolean
+  /** Admin : bouton « Terminer » / « Rouvrir » directement sur la carte. */
+  canManage?: boolean
+}
+
+export function ProjectCard({ project, showClient, canManage = false }: ProjectCardProps) {
   // Projet clos : la santé et les retards n'ont plus de sens, on affiche le statut.
   const closed = project.status === "completed" || project.status === "archived"
 
   return (
     <motion.div
+      className="relative"
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.99 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -71,6 +82,28 @@ export function ProjectCard({ project, showClient }: { project: ProjectOverview;
           <FinancialBadge status={project.financial_status} />
         </div>
       </Link>
+      {canManage && <StatusButton projectId={project.id} closed={closed} />}
     </motion.div>
+  )
+}
+
+/** Hors du lien de la carte : un clic ne navigue pas vers le projet. */
+function StatusButton({ projectId, closed }: { projectId: string; closed: boolean }) {
+  const { pending, run } = useAction()
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      disabled={pending}
+      onClick={() =>
+        run(() => setProjectStatus(projectId, closed ? "active" : "completed"), {
+          success: closed ? "Projet rouvert." : "Projet terminé.",
+        })
+      }
+      className="absolute right-5 bottom-5"
+    >
+      {pending ? <Loader2 className="animate-spin" /> : closed ? <RotateCcw /> : <Check />}
+      {closed ? "Rouvrir" : "Terminer"}
+    </Button>
   )
 }
