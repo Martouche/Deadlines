@@ -4,11 +4,14 @@ import Link from "next/link"
 import { motion } from "motion/react"
 import { AlertTriangle, CalendarClock, CheckCircle2 } from "lucide-react"
 
-import { FinancialBadge, HealthBadge, ProgressBar } from "@/components/project/status-badges"
-import { formatDeadline } from "@/lib/format"
+import { FinancialBadge, HealthBadge, ProgressBar, ProjectStatusLabel } from "@/components/project/status-badges"
+import { formatDate, formatDeadline } from "@/lib/format"
 import type { ProjectOverview } from "@/lib/types"
 
 export function ProjectCard({ project, showClient }: { project: ProjectOverview; showClient: boolean }) {
+  // Projet clos : la santé et les retards n'ont plus de sens, on affiche le statut.
+  const closed = project.status === "completed" || project.status === "archived"
+
   return (
     <motion.div
       whileHover={{ y: -2 }}
@@ -28,7 +31,13 @@ export function ProjectCard({ project, showClient }: { project: ProjectOverview;
             )}
             <h3 className="mt-1 truncate font-heading text-lg font-semibold tracking-tight">{project.title}</h3>
           </div>
-          <HealthBadge health={project.health} />
+          {closed ? (
+            <span className="rounded-full border border-white/10 px-2 py-0.5">
+              <ProjectStatusLabel status={project.status} />
+            </span>
+          ) : (
+            <HealthBadge health={project.health} />
+          )}
         </div>
 
         <div className="mt-5 flex items-center justify-between text-xs text-muted-foreground">
@@ -42,15 +51,15 @@ export function ProjectCard({ project, showClient }: { project: ProjectOverview;
         <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <CalendarClock className="size-3.5" />
-            {formatDeadline(project.next_deadline ?? project.deadline)}
+            {closed ? formatDate(project.deadline) : formatDeadline(project.next_deadline ?? project.deadline)}
           </span>
-          {project.overdue_tasks > 0 && (
+          {!closed && project.overdue_tasks > 0 && (
             <span className="inline-flex items-center gap-1.5 text-red-300">
               <AlertTriangle className="size-3.5" />
               {project.overdue_tasks} en retard
             </span>
           )}
-          {project.awaiting_validation > 0 && (
+          {!closed && project.awaiting_validation > 0 && (
             <span className="inline-flex items-center gap-1.5 text-amber-300">
               <CheckCircle2 className="size-3.5" />
               {project.awaiting_validation} à valider
