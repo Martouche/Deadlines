@@ -1,14 +1,13 @@
 "use client"
 
-import { useEffect, useRef, useState, useTransition } from "react"
+import { useEffect, useRef, useState } from "react"
 import { format } from "date-fns"
 import { Loader2, Play, Square, Trash2 } from "lucide-react"
-import { toast } from "sonner"
 
 import { ConfirmButton } from "@/components/app/confirm-button"
 import { Field } from "@/components/app/field"
 import { SubmitButton } from "@/components/app/submit-button"
-import { useFormAction } from "@/components/app/use-form-action"
+import { useAction, useFormAction } from "@/components/app/use-action"
 import { FormMessage } from "@/components/auth/form-message"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,7 +19,7 @@ import type { TimeEntry } from "@/lib/types"
 type TaskOption = { id: string; title: string }
 
 export function Timer({ projectId, tasks, running }: { projectId: string; tasks: TaskOption[]; running: TimeEntry | null }) {
-  const [pending, startTransition] = useTransition()
+  const { pending, run } = useAction()
   const [taskId, setTaskId] = useState("")
   const [now, setNow] = useState(() => Date.now())
 
@@ -34,12 +33,6 @@ export function Timer({ projectId, tasks, running }: { projectId: string; tasks:
   const hh = String(Math.floor(elapsed / 3600)).padStart(2, "0")
   const mm = String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0")
   const ss = String(elapsed % 60).padStart(2, "0")
-
-  const run = (fn: () => Promise<{ error?: string }>) =>
-    startTransition(async () => {
-      const result = await fn()
-      if (result.error) toast.error(result.error)
-    })
 
   return (
     <div className="flex flex-wrap items-center gap-4 rounded-xl border border-white/10 p-5">

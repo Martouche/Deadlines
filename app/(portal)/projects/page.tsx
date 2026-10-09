@@ -8,6 +8,7 @@ import { ProjectCard } from "@/components/project/project-card"
 import { ProjectFilters } from "@/components/project/project-filters"
 import { buttonVariants } from "@/components/ui/button"
 import { requireUser } from "@/lib/auth"
+import { read } from "@/lib/data"
 import { PROJECT_VIEWS, matchesView, parseProjectQuery, sortProjects, type ProjectView } from "@/lib/project-views"
 import { createClient } from "@/lib/supabase/server"
 import type { ProjectOverview } from "@/lib/types"
@@ -21,9 +22,11 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
   const supabase = await createClient()
 
   // La RLS ne renvoie au client que ses projets ; le volume reste faible, on filtre ici.
-  const [{ data }, { data: clients }] = await Promise.all([
-    supabase.from("project_overview").select("*").returns<ProjectOverview[]>(),
-    isAdmin ? supabase.from("clients").select("id, name, company").order("name") : Promise.resolve({ data: null }),
+  const [data, clients] = await Promise.all([
+    read("project_overview", supabase.from("project_overview").select("*").returns<ProjectOverview[]>()),
+    isAdmin
+      ? read("clients", supabase.from("clients").select("id, name, company").order("name"))
+      : Promise.resolve(null),
   ])
 
   const visible = (data ?? [])
@@ -58,7 +61,9 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
         <EmptyState
           icon={FolderKanban}
           title="Aucun projet pour l'instant"
-          description={isAdmin ? "Crée ton premier projet." : "Tes projets apparaîtront ici dès qu'ils seront partagés avec toi."}
+          description={
+            isAdmin ? "Crée ton premier projet." : "Tes projets apparaîtront ici dès qu'ils seront partagés avec toi."
+          }
         />
       ) : (
         <>

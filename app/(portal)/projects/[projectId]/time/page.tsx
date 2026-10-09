@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { EntryList, ManualEntryForm, Timer } from "@/components/time/time-tracker"
+import { read } from "@/lib/data"
 import { formatMinutes, formatMoney } from "@/lib/format"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
@@ -15,14 +16,17 @@ export default async function TimePage({ params }: PageProps<"/projects/[project
   if (!isAdmin) notFound()
 
   const supabase = await createClient()
-  const [{ data: entries }, { data: tasks }] = await Promise.all([
-    supabase
-      .from("time_entries")
-      .select("id, task_id, started_at, ended_at, minutes, note, billable, task:tasks(title)")
-      .eq("project_id", projectId)
-      .order("started_at", { ascending: false })
-      .returns<TimeEntry[]>(),
-    supabase.from("tasks").select("id, title").eq("project_id", projectId).order("title"),
+  const [entries, tasks] = await Promise.all([
+    read(
+      "time_entries",
+      supabase
+        .from("time_entries")
+        .select("id, task_id, started_at, ended_at, minutes, note, billable, task:tasks(title)")
+        .eq("project_id", projectId)
+        .order("started_at", { ascending: false })
+        .returns<TimeEntry[]>(),
+    ),
+    read("tasks", supabase.from("tasks").select("id, title").eq("project_id", projectId).order("title")),
   ])
 
   const all = entries ?? []
@@ -73,7 +77,10 @@ export default async function TimePage({ params }: PageProps<"/projects/[project
                       <span className="font-mono text-muted-foreground">{formatMinutes(b.minutes)}</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-white/[0.06]">
-                      <div className="h-full rounded-full bg-foreground/70" style={{ width: `${(b.minutes / total) * 100}%` }} />
+                      <div
+                        className="h-full rounded-full bg-foreground/70"
+                        style={{ width: `${(b.minutes / total) * 100}%` }}
+                      />
                     </div>
                   </li>
                 ))}

@@ -10,32 +10,45 @@ import { InviteForm } from "@/components/clients/invite-form"
 import { FinancialBadge, ProjectStatusLabel } from "@/components/project/status-badges"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { deleteClientRecord, updateClientRecord } from "@/lib/actions/clients"
+import { read } from "@/lib/data"
 import { displayName, formatDate } from "@/lib/format"
 import { createClient } from "@/lib/supabase/server"
 import type { Client, FinancialStatus, ProjectStatus } from "@/lib/types"
 
 export const metadata: Metadata = { title: "Fiche client" }
 
-type ClientProject = { id: string; title: string; status: ProjectStatus; financial_status: FinancialStatus; deadline: string | null }
+type ClientProject = {
+  id: string
+  title: string
+  status: ProjectStatus
+  financial_status: FinancialStatus
+  deadline: string | null
+}
 type ClientUser = { id: string; email: string; full_name: string | null; project_members: { project_id: string }[] }
 
 export default async function ClientPage({ params }: PageProps<"/admin/clients/[clientId]">) {
   const { clientId } = await params
   const supabase = await createClient()
 
-  const [{ data: client }, { data: projects }, { data: users }] = await Promise.all([
-    supabase.from("clients").select("*").eq("id", clientId).maybeSingle<Client>(),
-    supabase
-      .from("projects")
-      .select("id, title, status, financial_status, deadline")
-      .eq("client_id", clientId)
-      .order("created_at", { ascending: false })
-      .returns<ClientProject[]>(),
-    supabase
-      .from("profiles")
-      .select("id, email, full_name, project_members(project_id)")
-      .eq("client_id", clientId)
-      .returns<ClientUser[]>(),
+  const [client, projects, users] = await Promise.all([
+    read("clients", supabase.from("clients").select("*").eq("id", clientId).maybeSingle<Client>()),
+    read(
+      "projects",
+      supabase
+        .from("projects")
+        .select("id, title, status, financial_status, deadline")
+        .eq("client_id", clientId)
+        .order("created_at", { ascending: false })
+        .returns<ClientProject[]>(),
+    ),
+    read(
+      "profiles",
+      supabase
+        .from("profiles")
+        .select("id, email, full_name, project_members(project_id)")
+        .eq("client_id", clientId)
+        .returns<ClientUser[]>(),
+    ),
   ])
   if (!client) notFound()
 
@@ -67,6 +80,7 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
           <h2 className="text-sm font-medium text-muted-foreground">Informations</h2>
           <div className="rounded-xl border border-white/10 p-5">
             <ClientForm
+              key={client.updated_at}
               action={updateClientRecord.bind(null, client.id)}
               client={client}
               submitLabel="Enregistrer"
@@ -79,7 +93,10 @@ export default async function ClientPage({ params }: PageProps<"/admin/clients/[
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-medium text-muted-foreground">Projets</h2>
-              <Link href={`/projects/new?client=${client.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+              <Link
+                href={`/projects/new?client=${client.id}`}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
                 <Plus /> Nouveau projet
               </Link>
             </div>

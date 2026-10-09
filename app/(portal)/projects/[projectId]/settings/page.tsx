@@ -7,6 +7,7 @@ import { MembersManager } from "@/components/project/members-manager"
 import { ProjectForm } from "@/components/project/project-form"
 import { Button } from "@/components/ui/button"
 import { deleteProject, updateProject } from "@/lib/actions/projects"
+import { read } from "@/lib/data"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
 
@@ -20,14 +21,20 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
   if (!isAdmin) notFound()
 
   const supabase = await createClient()
-  const [{ data: clients }, { data: memberRows }, { data: clientUsers }] = await Promise.all([
-    supabase.from("clients").select("id, name, company").order("name"),
-    supabase
-      .from("project_members")
-      .select("profile:profiles(id, email, full_name)")
-      .eq("project_id", projectId)
-      .returns<{ profile: Person | null }[]>(),
-    supabase.from("profiles").select("id, email, full_name").eq("client_id", project.client_id).returns<Person[]>(),
+  const [clients, memberRows, clientUsers] = await Promise.all([
+    read("clients", supabase.from("clients").select("id, name, company").order("name")),
+    read(
+      "project_members",
+      supabase
+        .from("project_members")
+        .select("profile:profiles(id, email, full_name)")
+        .eq("project_id", projectId)
+        .returns<{ profile: Person | null }[]>(),
+    ),
+    read(
+      "profiles",
+      supabase.from("profiles").select("id, email, full_name").eq("client_id", project.client_id).returns<Person[]>(),
+    ),
   ])
 
   const members = (memberRows ?? []).flatMap((r) => (r.profile ? [r.profile] : []))
@@ -39,7 +46,13 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-medium text-muted-foreground">Projet</h2>
         <div className="rounded-xl border border-white/10 p-6">
+          {/*
+            key : recrée le formulaire après chaque enregistrement. Sans ça, React remet
+            les <select> non contrôlés sur leur valeur du premier affichage (le statut
+            repassait à « Actif » et était réécrit au prochain enregistrement).
+          */}
           <ProjectForm
+            key={project.updated_at}
             action={updateProject.bind(null, projectId)}
             clients={(clients ?? []).map((c) => ({ id: c.id, label: c.company ? `${c.company} — ${c.name}` : c.name }))}
             project={project}
@@ -52,7 +65,12 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
       <div className="flex flex-col gap-10">
         <section className="flex flex-col gap-4">
           <h2 className="text-sm font-medium text-muted-foreground">Accès client</h2>
-          <MembersManager projectId={projectId} clientId={project.client_id} members={members} candidates={candidates} />
+          <MembersManager
+            projectId={projectId}
+            clientId={project.client_id}
+            members={members}
+            candidates={candidates}
+          />
         </section>
 
         <section className="flex flex-col gap-3 rounded-xl border border-red-400/20 p-5">

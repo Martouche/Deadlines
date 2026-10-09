@@ -1,3 +1,5 @@
+import { ActionError } from "@/lib/actions/run"
+
 // Lecture typée des champs de formulaire (partagé par les Server Actions).
 
 export function text(formData: FormData, key: string) {
@@ -7,7 +9,7 @@ export function text(formData: FormData, key: string) {
 
 export function requiredText(formData: FormData, key: string, label: string) {
   const value = text(formData, key)
-  if (!value) throw new FormError(`${label} est obligatoire.`)
+  if (!value) throw new ActionError(`${label} est obligatoire.`)
   return value
 }
 
@@ -16,14 +18,16 @@ export function euros(formData: FormData, key: string) {
   const raw = text(formData, key)
   if (!raw) return null
   const value = Number(raw.replace(/\s/g, "").replace(",", "."))
-  if (!Number.isFinite(value) || value < 0) throw new FormError("Montant invalide.")
+  if (!Number.isFinite(value) || value < 0) throw new ActionError("Montant invalide.")
   return Math.round(value * 100)
 }
 
-export class FormError extends Error {}
-
-/** Transforme une FormError en { error } ; relance tout le reste (redirect, erreurs inattendues). */
-export function formErrorMessage(error: unknown) {
-  if (error instanceof FormError) return error.message
-  throw error
+/** Contexte de log d'un formulaire : tous les champs, sauf les secrets. */
+export function formContext(formData: FormData) {
+  const context: Record<string, unknown> = {}
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith("$ACTION") || /password|confirm/i.test(key)) continue
+    context[key] = value instanceof File ? `[fichier ${value.name}]` : value
+  }
+  return context
 }

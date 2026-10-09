@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCheck, Eye, Loader2, Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
 
 import { ConfirmButton } from "@/components/app/confirm-button"
+import { useAction } from "@/components/app/use-action"
 import { PriorityBadge, TaskStatusBadge } from "@/components/project/status-badges"
 import { Checklist } from "@/components/tasks/checklist"
 import { CommentThread } from "@/components/tasks/comment-thread"
@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { deleteTask, setTaskLabels, updateTask, validateTask, type TaskPatch } from "@/lib/actions/tasks"
 import { TASK_PRIORITIES, TASK_STATUSES } from "@/lib/constants"
 import { formatDate, formatDeadline } from "@/lib/format"
-import type { ActionResult, Label, TaskDetail, TaskPriority, TaskStatus } from "@/lib/types"
+import type { Label, TaskDetail, TaskPriority, TaskStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 type TaskDialogProps = {
@@ -72,18 +72,8 @@ export function TaskDialog({ task, labels, isAdmin, currentUserId }: TaskDialogP
   )
 }
 
-function useTaskUpdate() {
-  const [pending, startTransition] = useTransition()
-  const run = (fn: () => Promise<ActionResult>) =>
-    startTransition(async () => {
-      const result = await fn()
-      if (result.error) toast.error(result.error)
-    })
-  return { pending, run }
-}
-
 function TaskHeader({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
-  const { run } = useTaskUpdate()
+  const { run } = useAction()
 
   if (!isAdmin) {
     return (
@@ -116,7 +106,7 @@ function TaskHeader({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
 function Description({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(task.description ?? "")
-  const { pending, run } = useTaskUpdate()
+  const { pending, run } = useAction()
 
   if (!isAdmin) {
     return task.description ? <Markdown>{task.description}</Markdown> : null
@@ -147,10 +137,8 @@ function Description({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) 
             <Button
               disabled={pending}
               onClick={() =>
-                run(async () => {
-                  const result = await updateTask(task.id, { description: draft.trim() || null })
-                  if (!result.error) setEditing(false)
-                  return result
+                run(() => updateTask(task.id, { description: draft.trim() || null }), {
+                  onSuccess: () => setEditing(false),
                 })
               }
             >
@@ -175,7 +163,7 @@ function Description({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) 
 }
 
 function Properties({ task, labels, isAdmin }: { task: TaskDetail; labels: Label[]; isAdmin: boolean }) {
-  const { run } = useTaskUpdate()
+  const { run } = useAction()
   const save = (patch: TaskPatch) => run(() => updateTask(task.id, patch))
   const labelMap = new Map(labels.map((l) => [l.id, l]))
 
@@ -268,7 +256,7 @@ function Property({ label, children }: { label: string; children: React.ReactNod
 }
 
 function Validation({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
-  const { pending, run } = useTaskUpdate()
+  const { pending, run } = useAction()
 
   if (task.client_validated_at) {
     return (
@@ -294,7 +282,7 @@ function Validation({ task, isAdmin }: { task: TaskDetail; isAdmin: boolean }) {
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3">
       <p className="text-xs text-amber-200">Cette étape attend ta validation.</p>
-      <Button disabled={pending} onClick={() => run(() => validateTask(task.id))}>
+      <Button disabled={pending} onClick={() => run(() => validateTask(task.id), { success: "Étape validée, merci !" })}>
         {pending ? <Loader2 className="animate-spin" /> : <CheckCheck />}
         Valider cette étape
       </Button>

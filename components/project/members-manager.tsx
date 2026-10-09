@@ -1,15 +1,14 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Loader2, UserMinus, UserPlus } from "lucide-react"
-import { toast } from "sonner"
 
+import { useAction } from "@/components/app/use-action"
 import { Button } from "@/components/ui/button"
 import { NativeSelect } from "@/components/ui/native-select"
 import { addProjectMember, removeProjectMember } from "@/lib/actions/projects"
 import { displayName } from "@/lib/format"
-import type { ActionResult } from "@/lib/types"
 
 type Person = { id: string; email: string; full_name: string | null }
 
@@ -21,15 +20,10 @@ type MembersManagerProps = {
 }
 
 export function MembersManager({ projectId, clientId, members, candidates }: MembersManagerProps) {
-  const [pending, startTransition] = useTransition()
+  const { pending, run: runAction } = useAction()
   const [selected, setSelected] = useState("")
 
-  const run = (fn: () => Promise<ActionResult>) =>
-    startTransition(async () => {
-      const result = await fn()
-      if (result.error) toast.error(result.error)
-      else setSelected("")
-    })
+  const run = (fn: Parameters<typeof runAction>[0]) => runAction(fn, { onSuccess: () => setSelected("") })
 
   return (
     <div className="flex flex-col gap-4">

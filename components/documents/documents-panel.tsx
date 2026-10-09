@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useTransition } from "react"
+import { useRef, useState } from "react"
 import {
   Download,
   Eye,
@@ -19,13 +19,12 @@ import {
   Upload,
   type LucideIcon,
 } from "lucide-react"
-import { toast } from "sonner"
 
 import { ConfirmButton } from "@/components/app/confirm-button"
 import { EmptyState } from "@/components/app/empty-state"
 import { Field } from "@/components/app/field"
 import { SubmitButton } from "@/components/app/submit-button"
-import { useFormAction } from "@/components/app/use-form-action"
+import { useAction, useFormAction } from "@/components/app/use-action"
 import { FormMessage } from "@/components/auth/form-message"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -40,6 +39,7 @@ import {
 } from "@/lib/actions/documents"
 import { DOCUMENT_KINDS, optionOf } from "@/lib/constants"
 import { formatBytes, formatDate } from "@/lib/format"
+import { reportClientError } from "@/lib/actions/account"
 import { createClient } from "@/lib/supabase/client"
 import type { DocumentKind, ProjectDocument } from "@/lib/types"
 
@@ -86,21 +86,17 @@ export function DocumentsPanel({ projectId, documents, isAdmin }: DocumentsPanel
 }
 
 function DocumentRow({ doc, isAdmin }: { doc: ProjectDocument; isAdmin: boolean }) {
-  const [pending, startTransition] = useTransition()
+  const { pending, run } = useAction()
   const Icon = KIND_ICONS[doc.kind]
 
   const download = () =>
-    startTransition(async () => {
+    run(async () => {
       const result = await getDownloadUrl(doc.id)
       if (result.url) window.location.assign(result.url)
-      else toast.error(result.error ?? "Téléchargement impossible.")
+      return result
     })
 
-  const toggleVisibility = () =>
-    startTransition(async () => {
-      const result = await setDocumentVisibility(doc.id, !doc.visible_to_client)
-      if (result.error) toast.error(result.error)
-    })
+  const toggleVisibility = () => run(() => setDocumentVisibility(doc.id, !doc.visible_to_client))
 
   return (
     <li className="flex items-center gap-4 px-4 py-3">
@@ -162,40 +158,40 @@ function DocumentRow({ doc, isAdmin }: { doc: ProjectDocument; isAdmin: boolean 
 
 function UploadDialog({ projectId }: { projectId: string }) {
   const [open, setOpen] = useState(false)
-  const [pending, startTransition] = useTransition()
-  const [error, setError] = useState<string>()
+  const { pending, run } = useAction()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const upload = (formData: FormData) => {
-    const file = fileRef.current?.files?.[0]
-    if (!file) return setError("Choisis un fichier.")
-    setError(undefined)
+  const upload = (formData: FormData) =>
+    run(
+      async () => {
+        const file = fileRef.current?.files?.[0]
+        if (!file) return { error: "Choisis un fichier." }
 
-    startTransition(async () => {
-      const safeName = file.name
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .replace(/[^\w.-]+/g, "-")
-      const path = `${projectId}/${crypto.randomUUID()}-${safeName}`
-      const supabase = createClient()
-      const { error: uploadError } = await supabase.storage
-        .from("project-files")
-        .upload(path, file, { contentType: file.type || undefined })
-      if (uploadError) return setError(`Envoi impossible : ${uploadError.message}`)
+        const safeName = file.name
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .replace(/[^w.-]+/g, "-")
+        const path = `${projectId}/${crypto.randomUUID()}-${safeName}`
+        // Envoi direct navigateur → Storage : un échec n'atteint pas le serveur, on le lui signale.
+        const { error } = await createClient()
+          .storage.from("project-files")
+          .upload(path, file, { contentType: file.type || undefined })
+        if (error) {
+          void reportClientError({ message: `Upload Storage : ${error.message}`, path: window.location.pathname })
+          return { error: `Envoi du fichier impossible : ${error.message}` }
+        }
 
-      const result = await registerUpload(projectId, {
-        path,
-        title: String(formData.get("title") || file.name),
-        kind: String(formData.get("kind")) as DocumentKind,
-        mimeType: file.type,
-        size: file.size,
-        visibleToClient: formData.get("visible_to_client") === "on",
-      })
-      if (result.error) return setError(result.error)
-      toast.success("Fichier ajouté.")
-      setOpen(false)
-    })
-  }
+        return registerUpload(projectId, {
+          path,
+          title: String(formData.get("title") || file.name),
+          kind: String(formData.get("kind")) as DocumentKind,
+          mimeType: file.type,
+          size: file.size,
+          visibleToClient: formData.get("visible_to_client") === "on",
+        })
+      },
+      { success: "Fichier ajouté.", onSuccess: () => setOpen(false) },
+    )
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -214,7 +210,6 @@ function UploadDialog({ projectId }: { projectId: string }) {
             <Input id="doc-title" name="title" className="h-9" />
           </Field>
           <KindAndVisibility kinds={FILE_KINDS} />
-          <FormMessage tone="error" message={error} />
           <Button type="submit" size="lg" disabled={pending}>
             {pending && <Loader2 className="animate-spin" />}
             Envoyer

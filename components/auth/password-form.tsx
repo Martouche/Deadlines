@@ -1,19 +1,17 @@
 "use client"
 
-import { useActionState } from "react"
 import Link from "next/link"
 import { Loader2 } from "lucide-react"
 
+import { useFormAction } from "@/components/app/use-action"
 import { FormMessage } from "@/components/auth/form-message"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { updatePassword, type PasswordState } from "@/lib/actions/account"
-
-const idle: PasswordState = { status: "idle" }
+import { updatePassword } from "@/lib/actions/account"
 
 export function PasswordForm() {
-  const [state, action, pending] = useActionState(updatePassword, idle)
+  const [state, action, pending] = useFormAction(updatePassword)
 
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -25,7 +23,7 @@ export function PasswordForm() {
         <Label htmlFor="confirm">Confirmation</Label>
         <Input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={10} required className="h-9" />
       </div>
-      <FormMessage tone="error" message={state.message} />
+      <FormMessage tone="error" message={state.error} />
       <div className="flex gap-2">
         <Button type="submit" size="lg" disabled={pending} className="flex-1">
           {pending && <Loader2 className="animate-spin" />}

@@ -6,6 +6,7 @@ import { ProjectForm } from "@/components/project/project-form"
 import { buttonVariants } from "@/components/ui/button"
 import { createProject } from "@/lib/actions/projects"
 import { requireAdmin } from "@/lib/auth"
+import { read } from "@/lib/data"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = { title: "Nouveau projet" }
@@ -14,7 +15,7 @@ export default async function NewProjectPage({ searchParams }: PageProps<"/proje
   await requireAdmin()
   const { client } = await searchParams
   const supabase = await createClient()
-  const { data: clients } = await supabase.from("clients").select("id, name, company").order("name")
+  const clients = await read("clients", supabase.from("clients").select("id, name, company").order("name"))
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">

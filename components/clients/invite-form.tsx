@@ -4,7 +4,7 @@ import { useRef } from "react"
 
 import { Field } from "@/components/app/field"
 import { SubmitButton } from "@/components/app/submit-button"
-import { useFormAction } from "@/components/app/use-form-action"
+import { useFormAction } from "@/components/app/use-action"
 import { FormMessage } from "@/components/auth/form-message"
 import { Input } from "@/components/ui/input"
 import { inviteClientUser } from "@/lib/actions/clients"

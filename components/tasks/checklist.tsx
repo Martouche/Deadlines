@@ -1,23 +1,16 @@
 "use client"
 
-import { useTransition } from "react"
 import { Check, Plus, X } from "lucide-react"
-import { toast } from "sonner"
 
+import { useAction } from "@/components/app/use-action"
 import { Input } from "@/components/ui/input"
 import { addChecklistItem, deleteChecklistItem, toggleChecklistItem } from "@/lib/actions/tasks"
-import type { ActionResult, ChecklistItem } from "@/lib/types"
+import type { ChecklistItem } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 export function Checklist({ taskId, items, isAdmin }: { taskId: string; items: ChecklistItem[]; isAdmin: boolean }) {
-  const [pending, startTransition] = useTransition()
+  const { pending, run } = useAction()
   const done = items.filter((i) => i.is_done).length
-
-  const run = (fn: () => Promise<ActionResult>) =>
-    startTransition(async () => {
-      const result = await fn()
-      if (result.error) toast.error(result.error)
-    })
 
   if (!isAdmin && items.length === 0) return null
 
@@ -68,11 +61,7 @@ export function Checklist({ taskId, items, isAdmin }: { taskId: string; items: C
             e.preventDefault()
             const form = e.currentTarget
             const title = String(new FormData(form).get("title") ?? "")
-            run(async () => {
-              const result = await addChecklistItem(taskId, title)
-              if (!result.error) form.reset()
-              return result
-            })
+            run(() => addChecklistItem(taskId, title), { onSuccess: () => form.reset() })
           }}
         >
           <Plus className="size-4 text-muted-foreground" />

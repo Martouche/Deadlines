@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { DocumentsPanel } from "@/components/documents/documents-panel"
+import { read } from "@/lib/data"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
 import type { ProjectDocument } from "@/lib/types"
@@ -13,12 +14,15 @@ export default async function DocumentsPage({ params }: PageProps<"/projects/[pr
   const supabase = await createClient()
 
   // La RLS masque au client les documents non visibles.
-  const { data } = await supabase
-    .from("project_documents")
-    .select("id, kind, title, description, storage_path, url, mime_type, size_bytes, visible_to_client, created_at")
-    .eq("project_id", projectId)
-    .order("created_at", { ascending: false })
-    .returns<ProjectDocument[]>()
+  const data = await read(
+    "project_documents",
+    supabase
+      .from("project_documents")
+      .select("id, kind, title, description, storage_path, url, mime_type, size_bytes, visible_to_client, created_at")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .returns<ProjectDocument[]>(),
+  )
 
   return <DocumentsPanel projectId={projectId} documents={data ?? []} isAdmin={isAdmin} />
 }

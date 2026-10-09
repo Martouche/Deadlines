@@ -1,10 +1,10 @@
 "use client"
 
-import { useRef, useTransition } from "react"
+import { useRef } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { Loader2, Send, Trash2 } from "lucide-react"
-import { toast } from "sonner"
 
+import { useAction } from "@/components/app/use-action"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { addComment, deleteComment } from "@/lib/actions/comments"
@@ -19,21 +19,13 @@ type CommentThreadProps = {
 }
 
 export function CommentThread({ taskId, comments, currentUserId, isAdmin }: CommentThreadProps) {
-  const [pending, startTransition] = useTransition()
+  const { pending, run } = useAction()
   const formRef = useRef<HTMLFormElement>(null)
 
   const submit = (formData: FormData) =>
-    startTransition(async () => {
-      const result = await addComment(taskId, String(formData.get("body") ?? ""))
-      if (result.error) toast.error(result.error)
-      else formRef.current?.reset()
-    })
+    run(() => addComment(taskId, String(formData.get("body") ?? "")), { onSuccess: () => formRef.current?.reset() })
 
-  const remove = (id: string) =>
-    startTransition(async () => {
-      const result = await deleteComment(id)
-      if (result.error) toast.error(result.error)
-    })
+  const remove = (id: string) => run(() => deleteComment(id))
 
   return (
     <section>

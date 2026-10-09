@@ -5,6 +5,7 @@ import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-p
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
+import { useAction } from "@/components/app/use-action"
 import { TaskCard } from "@/components/tasks/task-card"
 import { useTaskLink } from "@/components/tasks/use-task-link"
 import { Input } from "@/components/ui/input"
@@ -52,8 +53,14 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
 
     startTransition(async () => {
       applyMove({ id: draggableId, status, position })
-      const result = await moveTask(draggableId, status, position)
-      if (result.error) toast.error(result.error)
+      try {
+        const result = await moveTask(draggableId, status, position)
+        // En cas d'échec, l'état optimiste est abandonné : la carte revient à sa place.
+        if (result.error) toast.error(result.error)
+      } catch (error) {
+        console.error("[action] tasks.move", error)
+        toast.error("Le serveur n'a pas répondu : déplacement annulé.")
+      }
     })
   }
 
@@ -112,7 +119,7 @@ export function KanbanBoard({ projectId, tasks, labels, isAdmin }: KanbanBoardPr
 
 function QuickAdd({ projectId, status }: { projectId: string; status: TaskStatus }) {
   const [open, setOpen] = useState(false)
-  const [pending, startTransition] = useTransition()
+  const { pending, run } = useAction()
 
   if (!open) {
     return (
@@ -132,11 +139,7 @@ function QuickAdd({ projectId, status }: { projectId: string; status: TaskStatus
         e.preventDefault()
         const form = e.currentTarget
         const title = String(new FormData(form).get("title") ?? "")
-        startTransition(async () => {
-          const result = await createTask(projectId, status, title)
-          if (result.error) toast.error(result.error)
-          else form.reset()
-        })
+        run(() => createTask(projectId, status, title), { onSuccess: () => form.reset() })
       }}
     >
       <Input

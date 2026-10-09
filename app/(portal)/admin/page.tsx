@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/app/page-header"
 import { ProjectCard } from "@/components/project/project-card"
 import { PriorityBadge } from "@/components/project/status-badges"
 import { buttonVariants } from "@/components/ui/button"
+import { read } from "@/lib/data"
 import { formatDeadline, formatMinutes } from "@/lib/format"
 import { createClient } from "@/lib/supabase/server"
 import type { ProjectOverview, TaskPriority } from "@/lib/types"
@@ -28,23 +29,32 @@ export default async function AdminDashboardPage() {
   const supabase = await createClient()
   const today = new Date()
 
-  const [{ data: projects }, { data: upcoming }, { data: timeRows }] = await Promise.all([
-    supabase
-      .from("project_overview")
-      .select("*")
-      .in("status", ["active", "on_hold"])
-      .order("next_deadline", { ascending: true, nullsFirst: false })
-      .returns<ProjectOverview[]>(),
-    supabase
-      .from("tasks")
-      .select("id, title, deadline, priority, project_id, project:projects(title)")
-      .neq("status", "done")
-      .not("deadline", "is", null)
-      .lte("deadline", format(addDays(today, 14), "yyyy-MM-dd"))
-      .order("deadline")
-      .limit(8)
-      .returns<UpcomingTask[]>(),
-    supabase.from("time_entries").select("minutes").gte("started_at", startOfMonth(today).toISOString()),
+  const [projects, upcoming, timeRows] = await Promise.all([
+    read(
+      "project_overview",
+      supabase
+        .from("project_overview")
+        .select("*")
+        .in("status", ["active", "on_hold"])
+        .order("next_deadline", { ascending: true, nullsFirst: false })
+        .returns<ProjectOverview[]>(),
+    ),
+    read(
+      "tasks",
+      supabase
+        .from("tasks")
+        .select("id, title, deadline, priority, project_id, project:projects(title)")
+        .neq("status", "done")
+        .not("deadline", "is", null)
+        .lte("deadline", format(addDays(today, 14), "yyyy-MM-dd"))
+        .order("deadline")
+        .limit(8)
+        .returns<UpcomingTask[]>(),
+    ),
+    read(
+      "time_entries",
+      supabase.from("time_entries").select("minutes").gte("started_at", startOfMonth(today).toISOString()),
+    ),
   ])
 
   const active = projects ?? []
@@ -88,7 +98,11 @@ export default async function AdminDashboardPage() {
         <section>
           <h2 className="mb-4 text-sm font-medium text-muted-foreground">Projets en cours</h2>
           {active.length === 0 ? (
-            <EmptyState icon={FolderKanban} title="Aucun projet en cours" description="Crée un client puis son premier projet.">
+            <EmptyState
+              icon={FolderKanban}
+              title="Aucun projet en cours"
+              description="Crée un client puis son premier projet."
+            >
               <Link href="/admin/clients" className={buttonVariants({ variant: "outline" })}>
                 Aller aux clients
               </Link>
@@ -119,7 +133,12 @@ export default async function AdminDashboardPage() {
                     <p className="truncate text-xs text-muted-foreground">{t.project?.title}</p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className={cn("text-xs", t.deadline < format(today, "yyyy-MM-dd") ? "text-red-300" : "text-muted-foreground")}>
+                    <span
+                      className={cn(
+                        "text-xs",
+                        t.deadline < format(today, "yyyy-MM-dd") ? "text-red-300" : "text-muted-foreground",
+                      )}
+                    >
                       {formatDeadline(t.deadline)}
                     </span>
                     <PriorityBadge priority={t.priority} />

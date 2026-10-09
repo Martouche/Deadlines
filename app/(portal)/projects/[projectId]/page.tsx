@@ -1,5 +1,6 @@
 import { TaskDialog } from "@/components/tasks/task-dialog"
 import { TasksView, type TasksViewMode } from "@/components/tasks/tasks-view"
+import { read } from "@/lib/data"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
 import type { Comment, Label, TaskCardData, TaskDetail, TaskPriority, TaskStatus } from "@/lib/types"
@@ -29,26 +30,32 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
   const { isAdmin, profile } = await getProject(projectId)
   const supabase = await createClient()
 
-  const [{ data: rows }, { data: labels }, detail] = await Promise.all([
-    supabase
-      .from("tasks")
-      .select(
-        "id, title, status, priority, deadline, position, client_validated_at, task_labels(label_id), task_comments(count), task_checklist_items(is_done)",
-      )
-      .eq("project_id", projectId)
-      .order("position")
-      .returns<TaskRow[]>(),
-    supabase.from("labels").select("id, name, color").order("name").returns<Label[]>(),
+  const [rows, labels, d] = await Promise.all([
+    read(
+      "tasks",
+      supabase
+        .from("tasks")
+        .select(
+          "id, title, status, priority, deadline, position, client_validated_at, task_labels(label_id), task_comments(count), task_checklist_items(is_done)",
+        )
+        .eq("project_id", projectId)
+        .order("position")
+        .returns<TaskRow[]>(),
+    ),
+    read("labels", supabase.from("labels").select("id, name, color").order("name").returns<Label[]>()),
     typeof taskId === "string"
-      ? supabase
-          .from("tasks")
-          .select(
-            "id, project_id, title, description, status, priority, deadline, client_validated_at, task_labels(label_id), task_checklist_items(id, title, is_done, position), task_comments(id, body, created_at, author_id, author:profiles(full_name, email, role))",
-          )
-          .eq("id", taskId)
-          .eq("project_id", projectId)
-          .maybeSingle<TaskDetailRow>()
-      : Promise.resolve({ data: null }),
+      ? read(
+          "task_detail",
+          supabase
+            .from("tasks")
+            .select(
+              "id, project_id, title, description, status, priority, deadline, client_validated_at, task_labels(label_id), task_checklist_items(id, title, is_done, position), task_comments(id, body, created_at, author_id, author:profiles(full_name, email, role))",
+            )
+            .eq("id", taskId)
+            .eq("project_id", projectId)
+            .maybeSingle<TaskDetailRow>(),
+        )
+      : Promise.resolve(null),
   ])
 
   const tasks: TaskCardData[] = (rows ?? []).map((t) => ({
@@ -65,7 +72,6 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
     checklist_done: t.task_checklist_items.filter((i) => i.is_done).length,
   }))
 
-  const d = detail.data
   const task: TaskDetail | null = d
     ? {
         id: d.id,
@@ -91,7 +97,9 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
         isAdmin={isAdmin}
         view={(view === "list" ? "list" : "kanban") satisfies TasksViewMode}
       />
-      {task && <TaskDialog key={task.id} task={task} labels={labels ?? []} isAdmin={isAdmin} currentUserId={profile.id} />}
+      {task && (
+        <TaskDialog key={task.id} task={task} labels={labels ?? []} isAdmin={isAdmin} currentUserId={profile.id} />
+      )}
     </>
   )
 }

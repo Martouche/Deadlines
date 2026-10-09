@@ -3,6 +3,7 @@ import { History } from "lucide-react"
 
 import { EmptyState } from "@/components/app/empty-state"
 import { formatActivity } from "@/lib/activity"
+import { read } from "@/lib/data"
 import { formatDate, formatRelative } from "@/lib/format"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
@@ -15,13 +16,16 @@ export default async function ActivityPage({ params }: PageProps<"/projects/[pro
   const { isAdmin } = await getProject(projectId)
   const supabase = await createClient()
 
-  const { data } = await supabase
-    .from("activity_logs")
-    .select("id, action, meta, created_at, visible_to_client, actor:profiles(full_name, email)")
-    .eq("project_id", projectId)
-    .order("created_at", { ascending: false })
-    .limit(200)
-    .returns<ActivityLog[]>()
+  const data = await read(
+    "activity_logs",
+    supabase
+      .from("activity_logs")
+      .select("id, action, meta, created_at, visible_to_client, actor:profiles(full_name, email)")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .limit(200)
+      .returns<ActivityLog[]>(),
+  )
   const logs = data ?? []
 
   if (logs.length === 0) {

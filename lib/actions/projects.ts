@@ -3,7 +3,8 @@
 import { refresh } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { FormError, euros, formErrorMessage, requiredText, text } from "@/lib/actions/form"
+import { euros, formContext, requiredText, text } from "@/lib/actions/form"
+import { check, checkRows, runAction } from "@/lib/actions/run"
 import { assertAdmin } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import type { ActionResult } from "@/lib/types"
@@ -22,68 +23,78 @@ function projectFields(formData: FormData) {
 }
 
 export async function createProject(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await assertAdmin()
-  let id: string
-  try {
+  return runAction("projects.create", formContext(formData), async () => {
+    await assertAdmin()
     const supabase = await createClient()
-    const { data, error } = await supabase.from("projects").insert(projectFields(formData)).select("id").single()
-    if (error) throw new FormError(error.message)
-    id = data.id
-  } catch (error) {
-    return { error: formErrorMessage(error) }
-  }
-  redirect(`/projects/${id}`)
+    const created = check(
+      await supabase.from("projects").insert(projectFields(formData)).select("id").single(),
+      "Création du projet",
+    )
+    redirect(`/projects/${created.id}`)
+  })
 }
 
 export async function updateProject(projectId: string, _prev: ActionResult, formData: FormData): Promise<ActionResult> {
-  await assertAdmin()
-  try {
+  return runAction("projects.update", { projectId, ...formContext(formData) }, async () => {
+    await assertAdmin()
     const supabase = await createClient()
-    const { error } = await supabase.from("projects").update(projectFields(formData)).eq("id", projectId)
-    if (error) throw new FormError(error.message)
-  } catch (error) {
-    return { error: formErrorMessage(error) }
-  }
-  refresh()
-  return {}
+    checkRows(
+      await supabase.from("projects").update(projectFields(formData)).eq("id", projectId).select("id"),
+      "Mise à jour du projet",
+    )
+    refresh()
+  })
 }
 
 export async function deleteProject(projectId: string): Promise<ActionResult> {
-  await assertAdmin()
-  const supabase = await createClient()
+  return runAction("projects.delete", { projectId }, async () => {
+    await assertAdmin()
+    const supabase = await createClient()
 
-  // Les fichiers Storage ne partent pas en cascade : on les supprime d'abord.
-  const { data: docs } = await supabase
-    .from("project_documents")
-    .select("storage_path")
-    .eq("project_id", projectId)
-    .not("storage_path", "is", null)
-  const paths = (docs ?? []).map((d) => d.storage_path as string)
-  if (paths.length > 0) await supabase.storage.from("project-files").remove(paths)
+    // Les fichiers Storage ne partent pas en cascade : on les supprime d'abord.
+    const docs = check(
+      await supabase
+        .from("project_documents")
+        .select("storage_path")
+        .eq("project_id", projectId)
+        .not("storage_path", "is", null),
+      "Liste des fichiers du projet",
+    )
+    const paths = docs.map((d) => d.storage_path as string)
+    if (paths.length > 0) {
+      check(await supabase.storage.from("project-files").remove(paths), "Suppression des fichiers")
+    }
 
-  const { error } = await supabase.from("projects").delete().eq("id", projectId)
-  if (error) return { error: error.message }
-  redirect("/projects")
+    checkRows(await supabase.from("projects").delete().eq("id", projectId).select("id"), "Suppression du projet")
+    redirect("/projects")
+  })
 }
 
 export async function addProjectMember(projectId: string, profileId: string): Promise<ActionResult> {
-  await assertAdmin()
-  const supabase = await createClient()
-  const { error } = await supabase.from("project_members").insert({ project_id: projectId, profile_id: profileId })
-  if (error) return { error: error.message }
-  refresh()
-  return {}
+  return runAction("projects.member.add", { projectId, profileId }, async () => {
+    await assertAdmin()
+    const supabase = await createClient()
+    check(
+      await supabase.from("project_members").insert({ project_id: projectId, profile_id: profileId }),
+      "Ajout de l'accès",
+    )
+    refresh()
+  })
 }
 
 export async function removeProjectMember(projectId: string, profileId: string): Promise<ActionResult> {
-  await assertAdmin()
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from("project_members")
-    .delete()
-    .eq("project_id", projectId)
-    .eq("profile_id", profileId)
-  if (error) return { error: error.message }
-  refresh()
-  return {}
+  return runAction("projects.member.remove", { projectId, profileId }, async () => {
+    await assertAdmin()
+    const supabase = await createClient()
+    checkRows(
+      await supabase
+        .from("project_members")
+        .delete()
+        .eq("project_id", projectId)
+        .eq("profile_id", profileId)
+        .select("project_id"),
+      "Retrait de l'accès",
+    )
+    refresh()
+  })
 }

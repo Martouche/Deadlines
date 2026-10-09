@@ -11,6 +11,7 @@ const ADMIN_NAV: NavItem[] = [
   { href: "/admin", label: "Tableau de bord", exact: true },
   { href: "/admin/clients", label: "Clients" },
   { href: "/projects", label: "Projets" },
+  { href: "/admin/logs", label: "Logs" },
 ]
 
 const CLIENT_NAV: NavItem[] = [{ href: "/projects", label: "Mes projets" }]

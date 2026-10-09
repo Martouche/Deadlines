@@ -249,3 +249,13 @@ case 'task.status_changed':
 - Déploiement Vercel ; `NEXT_PUBLIC_SITE_URL` et `Site URL` Supabase = `https://portail.tondomaine.fr` ; CNAME du sous-domaine vers Vercel.
 - **Test de sécurité à faire avant d'inviter un vrai client** : crée un compte client de test, et depuis la console du navigateur essaie `supabase.from('tasks').update({ title: 'x' })`, `supabase.from('clients').select()`, `supabase.from('time_entries').select()` — tout doit renvoyer vide ou une erreur.
 - Supabase **Advisors → Security** : aucun avertissement RLS ne doit rester.
+
+---
+
+## 4. Débogage : erreurs et logs
+
+- **Server Actions** : toutes passent par `runAction(nom, contexte, fn)` (`lib/actions/run.ts`). Chaque exécution est journalisée (niveau, action, utilisateur, contexte, durée, erreur) avec une **référence** à 8 caractères, ajoutée à tout message d'erreur affiché (`… (réf. 3f2a9c1e)`).
+- **Erreurs Supabase** : `check()` traduit les codes Postgres/PostgREST en messages lisibles ; `checkRows()` signale un UPDATE/DELETE qui n'a touché aucune ligne (la RLS filtre sans lever d'erreur).
+- **Lectures des pages** : `read(label, requête)` (`lib/data.ts`) journalise et affiche l'échec au lieu d'une page vide.
+- **Navigateur** : `useAction()` / `useFormAction()` affichent toute erreur en toast, y compris serveur injoignable ; `error.tsx` remonte les plantages via `reportClientError`.
+- **Où lire les logs** : `/admin/logs` (table `app_logs`, filtre par niveau, recherche par action ou référence), et la sortie standard en JSON (terminal local, onglet Logs de Vercel).

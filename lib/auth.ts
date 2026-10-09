@@ -2,6 +2,8 @@ import "server-only"
 import { cache } from "react"
 import { notFound, redirect } from "next/navigation"
 
+import { ActionError } from "@/lib/actions/run"
+import { read } from "@/lib/data"
 import { createClient } from "@/lib/supabase/server"
 
 export type UserRole = "admin" | "client"
@@ -21,17 +23,14 @@ export const getProfile = cache(async (): Promise<Profile | null> => {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, avatar_url, role, client_id")
-    .eq("id", user.id)
-    .maybeSingle()
+  const data = await read(
+    "profil",
+    supabase.from("profiles").select("id, email, full_name, avatar_url, role, client_id").eq("id", user.id).maybeSingle<Profile>(),
+  )
 
   // Connecté mais sans profil : la migration n'est pas appliquée (ou le trigger a échoué).
   // On lève une erreur plutôt que de renvoyer vers /login (boucle de redirection).
-  if (error || !data) {
-    throw new Error("Profil introuvable. La migration Supabase a-t-elle été appliquée ?")
-  }
+  if (!data) throw new Error("Profil introuvable. La migration Supabase a-t-elle été appliquée ?")
   return data
 })
 
@@ -50,6 +49,7 @@ export async function requireAdmin() {
 /** Pour les Server Actions : erreur explicite plutôt qu'une page 404. La RLS reste la vraie barrière. */
 export async function assertAdmin() {
   const profile = await getProfile()
-  if (profile?.role !== "admin") throw new Error("Action réservée à l'administrateur.")
+  if (!profile) throw new ActionError("Session expirée : reconnecte-toi.")
+  if (profile.role !== "admin") throw new ActionError("Action réservée à l'administrateur.")
   return profile
 }

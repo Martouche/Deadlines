@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/app/empty-state"
 import { PageHeader } from "@/components/app/page-header"
 import { NewClientDialog } from "@/components/clients/new-client-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { read } from "@/lib/data"
 import { createClient } from "@/lib/supabase/server"
 import type { Client, ProjectStatus } from "@/lib/types"
 
@@ -18,11 +19,10 @@ type ClientRow = Client & {
 
 export default async function ClientsPage() {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from("clients")
-    .select("*, projects(id, status), profiles(id)")
-    .order("name")
-    .returns<ClientRow[]>()
+  const data = await read(
+    "clients",
+    supabase.from("clients").select("*, projects(id, status), profiles(id)").order("name").returns<ClientRow[]>(),
+  )
   const clients = data ?? []
 
   return (
