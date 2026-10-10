@@ -10,7 +10,7 @@ const components: Components = {
   p: (props) => <p className="my-2 leading-relaxed first:mt-0 last:mb-0" {...props} />,
   ul: (props) => <ul className="my-2 list-disc space-y-1 pl-5" {...props} />,
   ol: (props) => <ol className="my-2 list-decimal space-y-1 pl-5" {...props} />,
-  a: (props) => <a className="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer" {...props} />,
+  a: (props) => <a className="text-brand underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer" {...props} />,
   blockquote: (props) => <blockquote className="my-2 border-l-2 border-foreground/15 pl-3 text-muted-foreground" {...props} />,
   code: (props) => <code className="rounded bg-foreground/[0.06] px-1 py-0.5 font-mono text-[0.85em]" {...props} />,
   pre: (props) => <pre className="my-2 overflow-x-auto rounded-lg border border-border bg-muted/70 p-3 [&_code]:bg-transparent [&_code]:p-0" {...props} />,

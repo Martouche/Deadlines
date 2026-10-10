@@ -1,5 +1,6 @@
 import "server-only"
 import { after } from "next/server"
+import nodemailer from "nodemailer"
 
 import { getProfile } from "@/lib/auth"
 import { env } from "@/lib/env"
@@ -61,15 +62,36 @@ async function recipients(projectId: string) {
   return (data ?? []).map((p) => p.email as string).filter((email) => email !== actor.email)
 }
 
+/**
+ * Transport SMTP (boîte OVH : ssl0.ovh.net:465). Identifiants lus dans les variables
+ * d'environnement, jamais dans le code. null si la configuration est incomplète.
+ */
+function smtpTransport() {
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return null
+  const port = Number(SMTP_PORT ?? 465)
+  return nodemailer.createTransport({
+    host: SMTP_HOST,
+    port,
+    secure: port === 465, // 465 : TLS direct ; 587 : STARTTLS
+    auth: { user: SMTP_USER, pass: SMTP_PASS },
+  })
+}
+
 /** Programme l'envoi après la réponse : l'action n'attend jamais l'e-mail. */
 export async function notify(notification: Notification) {
   const ref = newRef()
-  const apiKey = process.env.RESEND_API_KEY
-  const from = process.env.NOTIFY_FROM
+  const transport = smtpTransport()
+  const from = process.env.NOTIFY_FROM ?? process.env.SMTP_USER
   const context = { event: notification.event, projectId: notification.projectId }
 
-  if (!apiKey || !from) {
-    await logEvent({ level: "info", action: "notify.skipped", ref, context: { ...context, reason: "RESEND_API_KEY ou NOTIFY_FROM manquant" } })
+  if (!transport || !from) {
+    await logEvent({
+      level: "info",
+      action: "notify.skipped",
+      ref,
+      context: { ...context, reason: "SMTP_HOST, SMTP_USER ou SMTP_PASS manquant" },
+    })
     return
   }
 
@@ -80,21 +102,17 @@ export async function notify(notification: Notification) {
     const started = Date.now()
     // Un envoi par destinataire : aucun client ne voit l'adresse des autres.
     const results = await Promise.allSettled(
-      to.map(async (recipient) => {
-        const response = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            from,
-            to: recipient,
-            subject: notification.subject,
-            html: renderHtml(notification),
-            text: `${notification.heading}\n\n${notification.body}\n\n${env.siteUrl}${notification.path}`,
-          }),
-        })
-        if (!response.ok) throw new Error(`Resend ${response.status} : ${await response.text()}`)
-      }),
+      to.map((recipient) =>
+        transport.sendMail({
+          from,
+          to: recipient,
+          subject: notification.subject,
+          html: renderHtml(notification),
+          text: `${notification.heading}\n\n${notification.body}\n\n${env.siteUrl}${notification.path}`,
+        }),
+      ),
     )
+    transport.close()
     const failures = results.filter((r): r is PromiseRejectedResult => r.status === "rejected")
     await logEvent({
       level: failures.length > 0 ? "error" : "info",

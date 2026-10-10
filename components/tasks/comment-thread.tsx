@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { addComment, deleteComment } from "@/lib/actions/comments"
 import { displayName, formatRelative } from "@/lib/format"
+import { exitFade, springs } from "@/lib/motion-tokens"
 import type { Comment } from "@/lib/types"
 
 type CommentThreadProps = {
@@ -39,8 +40,8 @@ export function CommentThread({ taskId, comments, currentUserId, isAdmin }: Comm
               layout
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              exit={{ opacity: 0, transition: exitFade }}
+              transition={springs.snappy}
               className="group rounded-lg border border-border bg-foreground/[0.02] px-3 py-2.5"
             >
               <div className="flex items-center gap-2 text-xs">

@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "motion/react"
 
+import { springs } from "@/lib/motion-tokens"
 import { cn } from "@/lib/utils"
 
 export type NavItem = { href: string; label: string; exact?: boolean }
@@ -28,7 +29,7 @@ export function MainNav({ items }: { items: NavItem[] }) {
               <motion.span
                 layoutId="main-nav-active"
                 className="absolute inset-0 rounded-md bg-foreground/[0.06]"
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                transition={springs.snappy}
               />
             )}
             <span className="relative">{item.label}</span>

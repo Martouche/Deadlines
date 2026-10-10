@@ -24,6 +24,9 @@
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-success: var(--success);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
@@ -49,6 +52,9 @@
 }
 
 :root {
+  --brand: oklch(0.546 0.215 262.9);
+  --brand-foreground: oklch(0.99 0 0);
+  --success: oklch(0.596 0.127 163.2);
   --background: oklch(0.982 0 0);
   --foreground: oklch(0.13 0 0);
   --card: oklch(1 0 0);
@@ -66,7 +72,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0 0);
   --input: oklch(0.87 0 0);
-  --ring: oklch(0.6 0 0);
+  --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -84,6 +90,9 @@
 }
 
 .dark {
+  --brand: oklch(0.714 0.143 254.6);
+  --brand-foreground: oklch(0.15 0 0);
+  --success: oklch(0.765 0.177 163.2);
   --background: oklch(0.095 0 0);
   --foreground: oklch(0.99 0 0);
   --card: oklch(0.155 0 0);
@@ -101,7 +110,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 15%);
   --input: oklch(1 0 0 / 20%);
-  --ring: oklch(0.65 0 0);
+  --ring: var(--brand);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -120,6 +129,28 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  /* L'en-tête collant (h-14) ne masque jamais l'élément qui a le focus. */
+  html {
+    scroll-padding-top: 4.5rem;
+  }
+  /* Tout ce qui est cliquable l'annonce. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="radio"],
+  summary,
+  select:not(:disabled),
+  label:has(input[type="checkbox"]) {
+    cursor: pointer;
+  }
+  /* Focus clavier : anneau de 2px à la couleur de marque, contraste ≥ 3:1. */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  [role="radio"]:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
   }
   body {
     @apply bg-background text-foreground;

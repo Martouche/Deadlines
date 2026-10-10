@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react"
 
+import { exitFade, springs } from "@/lib/motion-tokens"
 import { cn } from "@/lib/utils"
 
 type FormMessageProps = {
@@ -17,8 +18,8 @@ export function FormMessage({ tone, message }: FormMessageProps) {
           role={tone === "error" ? "alert" : "status"}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+          exit={{ opacity: 0, transition: exitFade }}
+          transition={springs.instant}
           className={cn(
             "rounded-lg border px-3 py-2 text-sm",
             tone === "error"

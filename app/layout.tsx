@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google"
 
+import { MotionProvider } from "@/components/app/motion-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { getTheme } from "@/lib/theme"
 import "./globals.css"
@@ -26,7 +27,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${theme === "dark" ? "dark " : ""}${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster theme={theme} position="bottom-right" />
       </body>
     </html>

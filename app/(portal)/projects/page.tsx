@@ -4,6 +4,7 @@ import { FolderKanban, Plus, SearchX } from "lucide-react"
 
 import { EmptyState } from "@/components/app/empty-state"
 import { PageHeader } from "@/components/app/page-header"
+import { StaggerGroup, StaggerItem } from "@/components/app/stagger"
 import { ClientHighlights } from "@/components/project/client-highlights"
 import { ProjectCard } from "@/components/project/project-card"
 import { ProjectFilters } from "@/components/project/project-filters"
@@ -83,11 +84,14 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
               description={query.view === "a-faire" ? "Tous les projets sont terminés ou archivés." : undefined}
             />
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            // key : la cascade se rejoue quand la vue ou le filtre change.
+            <StaggerGroup key={`${query.view}-${query.clientId}-${query.sort}`} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {projects.map((p) => (
-                <ProjectCard key={p.id} project={p} showClient={isAdmin} canManage={isAdmin} />
+                <StaggerItem key={p.id}>
+                  <ProjectCard project={p} showClient={isAdmin} canManage={isAdmin} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           )}
         </>
       )}

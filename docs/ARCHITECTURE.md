@@ -114,7 +114,7 @@ Règle d'or : **les Server Components lisent, les Server Actions écrivent**, to
 3. **Authentication → URL Configuration** : `Site URL = https://portail.tondomaine.fr`, ajoute `http://localhost:3000/**` aux redirections.
 4. **Email templates → Magic Link / Invite** : remplace le lien par
    `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/` (type `invite` pour le template d'invitation).
-5. Configure un SMTP (Resend, Brevo…) : le SMTP par défaut est limité à quelques e-mails par heure.
+5. Configure un SMTP pour les e-mails Supabase (Auth → SMTP Settings, ex. OVH ssl0.ovh.net:465) : le SMTP par défaut est limité à quelques e-mails par heure.
 
 ### Étape 1 — Next.js + dépendances
 ```bash
@@ -269,4 +269,4 @@ case 'task.status_changed':
 - **Kanban** : masquer les terminées (`?terminees=masquees`), édition rapide priorité/échéance au survol, temps réel (Supabase Realtime), badge « non lu » (table `task_reads`).
 - **Projets** : bouton Terminer/Rouvrir sur les cartes, duplication comme modèle (Paramètres), export CSV du temps (`/projects/[id]/time/export`).
 - **Clients** : accueil avec étapes à valider, prochaine échéance et derniers livrables ; commentaires en Markdown.
-- **E-mails** (`lib/notify.ts`, Resend) : message, étape à valider, étape validée, document ajouté. Désactivés sans `RESEND_API_KEY` / `NOTIFY_FROM`.
+- **E-mails** (`lib/notify.ts`, SMTP OVH via nodemailer) : message, étape à valider, étape validée, document ajouté. Désactivés sans `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS`.

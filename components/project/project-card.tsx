@@ -5,10 +5,12 @@ import { motion } from "motion/react"
 import { AlertTriangle, CalendarClock, Check, CheckCircle2, Loader2, RotateCcw } from "lucide-react"
 
 import { useAction } from "@/components/app/use-action"
-import { FinancialBadge, HealthBadge, ProgressBar, ProjectStatusLabel } from "@/components/project/status-badges"
+import { ProgressBar } from "@/components/project/progress-bar"
+import { FinancialBadge, HealthBadge, ProjectStatusLabel } from "@/components/project/status-badges"
 import { Button } from "@/components/ui/button"
 import { setProjectStatus } from "@/lib/actions/projects"
 import { formatDate, formatDeadline } from "@/lib/format"
+import { springs } from "@/lib/motion-tokens"
 import type { ProjectOverview } from "@/lib/types"
 
 type ProjectCardProps = {
@@ -27,7 +29,7 @@ export function ProjectCard({ project, showClient, canManage = false }: ProjectC
       className="relative"
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.99 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      transition={springs.snappy}
     >
       <Link
         href={`/projects/${project.id}`}

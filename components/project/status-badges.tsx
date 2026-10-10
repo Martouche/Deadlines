@@ -38,17 +38,3 @@ export function TaskStatusBadge({ status }: { status: TaskStatus }) {
     </span>
   )
 }
-
-export function ProgressBar({ value, className }: { value: number; className?: string }) {
-  return (
-    <div
-      role="progressbar"
-      aria-valuenow={value}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      className={cn("h-1.5 w-full overflow-hidden rounded-full bg-foreground/[0.06]", className)}
-    >
-      <div className="h-full rounded-full bg-foreground transition-[width]" style={{ width: `${value}%` }} />
-    </div>
-  )
-}

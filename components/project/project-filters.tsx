@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { motion } from "motion/react"
 
 import { NativeSelect } from "@/components/ui/native-select"
+import { springs } from "@/lib/motion-tokens"
 import { PROJECT_SORTS, PROJECT_VIEWS, type ProjectQuery, type ProjectView } from "@/lib/project-views"
 import { cn } from "@/lib/utils"
 
@@ -50,7 +51,7 @@ export function ProjectFilters({ query, counts, clients }: ProjectFiltersProps) 
                 <motion.span
                   layoutId="project-view-active"
                   className="absolute inset-0 rounded-md bg-foreground/[0.08]"
-                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  transition={springs.snappy}
                 />
               )}
               <span className="relative">{v.label}</span>

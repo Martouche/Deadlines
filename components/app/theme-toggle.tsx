@@ -6,6 +6,7 @@ import { Moon, Sun } from "lucide-react"
 
 import { useAction } from "@/components/app/use-action"
 import { setTheme } from "@/lib/actions/theme"
+import { springs } from "@/lib/motion-tokens"
 import { cn } from "@/lib/utils"
 
 type Theme = "light" | "dark"
@@ -56,7 +57,7 @@ export function ThemeToggle({ theme }: { theme: Theme }) {
               <motion.span
                 layoutId="theme-toggle-active"
                 className="absolute inset-0 rounded-md bg-foreground/[0.08]"
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                transition={springs.snappy}
               />
             )}
             <o.icon className="relative size-3.5" />

@@ -7,6 +7,7 @@ import { CalendarRange, Columns3, Eye, EyeOff, ListTodo } from "lucide-react"
 import { EmptyState } from "@/components/app/empty-state"
 import { KanbanBoard } from "@/components/tasks/kanban-board"
 import { TaskList } from "@/components/tasks/task-list"
+import { springs } from "@/lib/motion-tokens"
 import type { Label, TaskCardData } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -56,7 +57,7 @@ export function TasksView({ projectId, tasks, labels, isAdmin, view, hideDone }:
                 <motion.span
                   layoutId="tasks-view-active"
                   className="absolute inset-0 rounded-md bg-foreground/[0.08]"
-                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  transition={springs.snappy}
                 />
               )}
               <v.icon className="relative size-4" />

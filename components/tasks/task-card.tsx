@@ -62,7 +62,7 @@ export function TaskCard({ task, labels, href }: TaskCardProps) {
 export function UnreadBadge({ count }: { count: number }) {
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full bg-sky-500 px-1.5 py-0.5 font-medium text-white"
+      className="inline-flex items-center gap-1 rounded-full bg-brand px-1.5 py-0.5 font-medium text-brand-foreground"
       title={`${count} nouveau${count > 1 ? "x" : ""} message${count > 1 ? "s" : ""}`}
     >
       <MessageSquare className="size-3" />

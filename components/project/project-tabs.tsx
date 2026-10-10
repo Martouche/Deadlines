@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "motion/react"
 
+import { springs } from "@/lib/motion-tokens"
 import { cn } from "@/lib/utils"
 
 export function ProjectTabs({ projectId, isAdmin }: { projectId: string; isAdmin: boolean }) {
@@ -38,8 +39,8 @@ export function ProjectTabs({ projectId, isAdmin }: { projectId: string; isAdmin
             {active && (
               <motion.span
                 layoutId="project-tab-active"
-                className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-foreground"
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand"
+                transition={springs.snappy}
               />
             )}
           </Link>

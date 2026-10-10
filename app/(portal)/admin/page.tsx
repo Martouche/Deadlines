@@ -5,6 +5,7 @@ import { addDays, format, startOfMonth } from "date-fns"
 
 import { EmptyState } from "@/components/app/empty-state"
 import { PageHeader } from "@/components/app/page-header"
+import { StaggerGroup, StaggerItem } from "@/components/app/stagger"
 import { ProjectCard } from "@/components/project/project-card"
 import { PriorityBadge } from "@/components/project/status-badges"
 import { buttonVariants } from "@/components/ui/button"
@@ -108,11 +109,13 @@ export default async function AdminDashboardPage() {
               </Link>
             </EmptyState>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
+            <StaggerGroup className="grid gap-4 md:grid-cols-2">
               {active.map((p) => (
-                <ProjectCard key={p.id} project={p} showClient canManage />
+                <StaggerItem key={p.id}>
+                  <ProjectCard project={p} showClient canManage />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           )}
         </section>
 

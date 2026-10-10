@@ -1,7 +1,8 @@
 import { CalendarClock, Wallet } from "lucide-react"
 
 import { ProjectTabs } from "@/components/project/project-tabs"
-import { FinancialBadge, HealthBadge, ProgressBar, ProjectStatusLabel } from "@/components/project/status-badges"
+import { ProgressBar } from "@/components/project/progress-bar"
+import { FinancialBadge, HealthBadge, ProjectStatusLabel } from "@/components/project/status-badges"
 import { formatDate, formatDeadline, formatMoney } from "@/lib/format"
 import { getProject } from "@/lib/projects"
 
