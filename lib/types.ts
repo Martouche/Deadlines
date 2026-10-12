@@ -1,6 +1,7 @@
 // Miroir des types SQL (supabase/migrations). À remplacer par les types générés
 // (`npx supabase gen types typescript --linked > types/database.ts`) si besoin.
 
+// « backlog » existe encore dans l'enum SQL mais n'est plus utilisé (voir displayStatus).
 export type TaskStatus = "backlog" | "todo" | "in_progress" | "review" | "done"
 export type TaskPriority = "low" | "medium" | "high" | "urgent"
 export type ProjectStatus = "draft" | "active" | "on_hold" | "completed" | "archived"

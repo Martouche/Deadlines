@@ -1,6 +1,7 @@
 import { RealtimeRefresh } from "@/components/tasks/realtime-refresh"
 import { TaskDialog } from "@/components/tasks/task-dialog"
 import { TasksView, type TasksViewMode } from "@/components/tasks/tasks-view"
+import { displayStatus } from "@/lib/constants"
 import { read } from "@/lib/data"
 import { getProject } from "@/lib/projects"
 import { createClient } from "@/lib/supabase/server"
@@ -68,7 +69,7 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
   const tasks: TaskCardData[] = (rows ?? []).map((t) => ({
     id: t.id,
     title: t.title,
-    status: t.status,
+    status: displayStatus(t.status),
     priority: t.priority,
     deadline: t.deadline,
     position: t.position,
@@ -87,7 +88,7 @@ export default async function ProjectTasksPage({ params, searchParams }: PagePro
         project_id: d.project_id,
         title: d.title,
         description: d.description,
-        status: d.status,
+        status: displayStatus(d.status),
         priority: d.priority,
         deadline: d.deadline,
         client_validated_at: d.client_validated_at,

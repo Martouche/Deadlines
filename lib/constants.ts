@@ -10,7 +10,6 @@ import type {
 type Option<T extends string> = { value: T; label: string; className: string }
 
 export const TASK_STATUSES: Option<TaskStatus>[] = [
-  { value: "backlog", label: "Backlog", className: "bg-zinc-500" },
   { value: "todo", label: "À faire", className: "bg-sky-400" },
   { value: "in_progress", label: "En cours", className: "bg-violet-400" },
   { value: "review", label: "En révision", className: "bg-amber-400" },
@@ -55,6 +54,11 @@ export const DOCUMENT_KINDS: Option<DocumentKind>[] = [
   { value: "staging", label: "Staging / recette", className: "" },
   { value: "link", label: "Lien", className: "" },
 ]
+
+/** « Backlog » n'est plus utilisé : une tâche restée dans ce statut s'affiche en « À faire ». */
+export function displayStatus(status: TaskStatus): TaskStatus {
+  return status === "backlog" ? "todo" : status
+}
 
 export function optionOf<T extends string>(options: Option<T>[], value: T) {
   return options.find((o) => o.value === value) ?? options[0]

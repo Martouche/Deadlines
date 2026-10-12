@@ -60,7 +60,7 @@ export async function setProjectStatus(projectId: string, status: ProjectStatus)
 }
 
 /**
- * Duplique un projet comme modèle : tâches (remises au backlog, sans échéance),
+ * Duplique un projet comme modèle : tâches (remises « À faire », sans échéance),
  * étiquettes et sous-tâches (décochées). Ni documents, ni commentaires, ni temps.
  */
 export async function duplicateProject(projectId: string, _prev: ActionResult, formData: FormData): Promise<ActionResult> {
@@ -110,7 +110,7 @@ export async function duplicateProject(projectId: string, _prev: ActionResult, f
             description: t.description,
             priority: t.priority,
             position: t.position,
-            status: "backlog",
+            status: "todo",
           })),
         ),
         "Copie des tâches",

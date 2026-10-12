@@ -79,7 +79,7 @@ export default async function ProjectSettingsPage({ params }: PageProps<"/projec
           <div>
             <h2 className="text-sm font-medium text-muted-foreground">Dupliquer / modèle</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Copie les tâches (remises au backlog, sans échéance), étiquettes et sous-tâches. Astuce : garde des
+              Copie les tâches (remises « À faire », sans échéance), étiquettes et sous-tâches. Astuce : garde des
               projets « Brouillon » comme modèles réutilisables.
             </p>
           </div>
